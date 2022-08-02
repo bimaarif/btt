@@ -1,11 +1,11 @@
    <!-- Footer -->
-      <footer class="sticky-footer bg-white">
+      <!-- <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
             <span class="font-weight-bold">Copyright &copy;</span>
           </div>
         </div>
-      </footer>
+      </footer> -->
       <!-- End of Footer -->
 
     </div>
@@ -37,6 +37,8 @@
       </div>
     </div>
   </div>
+
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <!-- Bootstrap core JavaScript-->
   <script src="<?php echo base_url(); ?>assets/vendor/jquery/jquery.min.js"></script>
   <script src="<?php echo base_url(); ?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

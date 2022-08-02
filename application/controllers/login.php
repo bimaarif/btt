@@ -34,7 +34,7 @@ class login extends CI_Controller {
 			    $this->session->set_userdata('fullname', $cek->row()->fullname);
 
 	
-				redirect('admin/Dashboard');
+				redirect('admin/tambah_btt');
 			}
 		}
 

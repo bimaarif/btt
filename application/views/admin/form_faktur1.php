@@ -12,26 +12,27 @@
   <link rel="stylesheet" href="{{asset('css/jquery.datetimepicker.min.css')}}" />
   <title>Hello, world!</title>
   <style>
-    button:focus{
+    button:focus {
       outline: none;
     }
+
     header ul li a {
       color: #636e72;
       padding: 6px;
       border-radius: 8px;
     }
 
-    header ul li:hover, header ul li a:hover {
+    header ul li:hover,
+    header ul li a:hover {
       /* text-decoration: underline; */
       color: #2d3436;
       background-color: #81ecec;
     }
-
   </style>
 </head>
 
 <body>
-<header class="d-flex px-2 justify-content-between align-items-center w-100">
+  <header class="d-flex px-2 justify-content-between align-items-center w-100">
     <!-- <div class="border-bottom">
       <ul class="d-flex align-items-center list-unstyled text-decoration-none">
         <li class="position-relative">
@@ -39,69 +40,34 @@
         </li>
         <li style="margin-left:20px;"><a class="text-decoration-none" href="{{url('/')}}"><i class="fa-solid fa-eye"></i> Lihat BTTT</a></li>
       </ul>
-    </div> -->
+    </div>
 
-    <!-- <div class="py-3">
-      <a href="#" class=" fw-bold text-uppercase " style="outline-width: 0px; text-decoration: none; color: #636e72;" data-bs-toggle="modal" data-bs-target="#exampleModal"> &nbsp; <i class="fa-solid fa-caret-down"></i></a>
+    <div class="py-3">
+      <a href="#" class=" fw-bold text-uppercase " style="outline-width: 0px; text-decoration: none; color: #636e72;" data-bs-toggle="modal" data-bs-target="#exampleModal">&nbsp; <i class="fa-solid fa-caret-down"></i></a>
 
     </div> -->
 
   </header>
   <div class="container">
-
-    <div class="row">
-       <!-- Earnings (Monthly) Card Example -->
-      <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
-          <div class="card-body">
-            <div class="row no-gutters align-items-center">
-              <div class="col mr-2">
-                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1"></div>
-                <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
-              </div>
-              <div class="col-auto">
-                <i class="fas fa-users fa-2x text-gray-300"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Earnings (Monthly) Card Example -->
-      <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-success shadow h-100 py-2">
-          <div class="card-body">
-            <div class="row no-gutters align-items-center">
-              <div class="col mr-2">
-                <div class="text-xs font-weight-bold text-success text-uppercase mb-1"></div>
-                <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
-              </div>
-              <div class="col-auto">
-                <i class="fas fa-user-cog fa-2x text-gray-300"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <h5 class="my-3">Tambah BTT</h5>
+    
+    <?php echo $this->session->flashdata('message') ?>
+    <h5 class="my-3">Tambah faktur</h5>
+    <a href="<?php echo base_url(); ?>admin/tambah_receiving" type="button" class="btn btn-primary">kembali</a>
     <hr>
     <div">
-    <div class="row w-100 mb-3 fw-bold">
-      <div class="col-2">Scan Qrcode</div>
-      <div class="col-3">No Faktur</div>
-      <div class="col-3">No Receiving Suz</div>
-      <div class="col-3">Jumlah Tagihan</div>
-    </div>
-      <div id="allform">
-
+      <div class="row w-100 mb-3 fw-bold">
+        <div class="col-2">No Faktur</div>
+        <div class="col-3">faktur pajak</div>
+        <div class="col-3">Tagihan</div>
+        <div class="col-3">Upload csv</div>
       </div>
-      <div class="float-right" style="margin-top: 50px !important;">
-        <button onclick="simpan()" class="btn px-5 ml-3 text-white mb-3" style="background-color: indianred;">Lanjut</button>
-      </div>
-
-    </div>
+      <form method="POST" action="<?php echo base_url(); ?>admin/Form_faktur/insert_faktur" enctype="multipart/form-data">
+        <div id="allform"></div>
+        <div class="float-right" style="margin-top: 50px !important;">
+          <button type="submit" class="btn px-5 ml-3 text-white" style="background-color: indianred;" name='submit'>submit</button>
+        </div>
+      </form>
+  </div>
   </div>
 
   <!-- Modal -->
@@ -112,8 +78,8 @@
 
         <div class="modal-body text-center">
           <h4 class="">Apakah ada Faktur Pajak?</h4>
-          <a href="" class="btn btn-secondary" style="width: 100px;" >PKP</a>
-          <a href="" class="btn btn-primary ml-3" style="width: 100px;">NON PKP</a>
+          <a href="{{url('form/create/pkp')}}" class="btn btn-secondary" style="width: 100px;" >PKP</a>
+          <a href="{{url('form/create/nonpkp')}}" class="btn btn-primary ml-3" style="width: 100px;">NON PKP</a>
         </div>
 
       </div>
@@ -126,14 +92,11 @@
 
         <div class="modal-body text-center">
           <h4 class="">Anda ingin keluar?</h4>
-          <form method="POST" action="">
+          <form method="POST" action="{{url('/logout')}}">
             <button type="button" class="btn btn-secondary" style="width: 100px;" data-bs-dismiss="modal">Tidak</button>
             <button type="submit" class="btn btn-primary ml-3" style="width: 100px;">Ya</button>
-
           </form>
-
         </div>
-
       </div>
     </div>
   </div> -->
@@ -160,18 +123,15 @@
   <script src="{{asset('js/jquery.datetimepicker.full.min.js')}}"></script>
 
   <script>
-
     let no = 1;
-    let limit = 11;
     let temp = '';
-    $(document).ready(function(){
+    $(document).ready(function() {
       addRow();
-      
     })
 
 
     /* Fungsi formatRupiah */
-    function formatRupiah(me, prefix='Rp. ') {
+    function formatRupiah(me, prefix = 'Rp. ') {
       // console.log(me[0].value)
       let angka = me.value
       var number_string = angka.replace(/[^,\d]/g, '').toString(),
@@ -188,66 +148,61 @@
 
       rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
       me.value = prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
-      return 
+      return
     }
 
 
 
-function barcodePajak(me){
- 
-  $.ajax({
-    method:'post',
-    url:"{{url('chekqrcode')}}",
-    data: {
-      _token: "{{ csrf_token() }}",
-      url:me.value
-    },
-    success:function(res){
-      let tagihan = $(me).parent().parent().find('input[name=jumlah_tagihan]').val(res)
-  
-      formatRupiah(tagihan[0])    
+
+    function barcodePajak(me) {
+
+      $.ajax({
+        method: 'post',
+        url: "{{url('chekqrcode')}}",
+        data: {
+          _token: "{{ csrf_token() }}",
+          url: me.value
+        },
+        success: function(res) {
+          let tagihan = $(me).parent().parent().find('input[name=jumlah_tagihan]').val(res)
+
+          formatRupiah(tagihan[0])
+        }
+      })
+
     }
-  })
-  
-}
 
 
-function addRow(me=false){
+    function addRow(me = false) {
 
-// if(no >= limit){
-//   return true;
-// }
-// let forms = $('#allform').children().last().find('input[name=no_rcv_suzuya]').val();
+      if ($('#allform').children().length == 10) {
+        return;
+      }
 
-if($('#allform').children().length == 10){
-    return;
-}
+      $(me).addClass('d-none')
 
-  $(me).addClass('d-none');
-  
-  let row = `<div id="row${no}">
-    <form>
+      let row = ` 
         <div class="row w-100">
-          <div class="col-2 mb-3">
-            <label hidden for="fpajak" class="form-label">Barcode Pajak</label>
-            <input onChange="barcodePajak(this)" id="qrcode1" type="text" class="form-control qrcode" name="qrcode_pajak">
-            <div id="validationServerUsernameFeedback" class="invalid-feedback" id="qrcode" required>
+           <div class="col-2 mb-3">
+              <label hidden for="fpajak" class="form-label"></label>
+              <input onChange="barcodePajak(this)"type="text" class="form-control qrcode" name="no_faktur[]">
+              <div id="validationServerUsernameFeedback" class="invalid-feedback">
         Please choose a username.
-      </div>
-          </div>
-
-          <div class="col-3 mb-3">
-            <label hidden for="faktur" class="form-label">No Faktur </label>
-            <input type="text" class="form-control" name="no_faktur_supplier" id="" required>
-          </div>
+           </div>
+        </div>
     
           <div class="col-3 mb-3">
-            <label hidden for="receiving" class="form-label">No Receiving</label>
-            <input type="text" class="form-control" name="no_receiving_suzuya" required>
+            <label hidden for="receiving" class="form-label"></label>
+            <input type="text" class="form-control" name="fak_pjk[]" required>
           </div>
           <div class="col-3 mb-3">
-            <label hidden for="tagihan" class="form-label">Jumlah Tagihan</label>
-            <input onKeyup="formatRupiah(this)" value="" type="text" class="form-control" name="jumlah_tagihan" required>
+            <label hidden for="tagihan" class="form-label">Tagihan</label>
+            <input onKeyup="formatRupiah(this)" value="" type="text" class="form-control" name="tagihan[]" required>
+          </div>
+
+          <div class="col-3 mb-3">
+            <label hidden for="receiving" class="form-label">No Receiving</label>
+            <input type="file" class="form-control" name="csv[]" required>
           </div>
   
           <div class="col-1 mb-3 d-flex gap-1">
@@ -255,76 +210,72 @@ if($('#allform').children().length == 10){
             <button id="btnAdd" onclick="addRow(this)" type="button" class="btn btn-outline-success"><i class="fa-solid fa-plus"></i></button>
           </div>
         </div>
-    </form>
+        
+ 
       </div>
-`;
+`
 
+      $('#allform').append(row)
+      no++;
+    }
 
-$('#allform').append(row);
-no++;
-
-
-}
-
-function removeRow(me){
-  temp = $(me).parent().parent().parent().parent()[0].id
-  $('#alertModal').modal('show');
-
-}
-
-function setAccept(){
-  $(`#${temp}`).remove();
-  console.log($('#allform').children().last().find('#btnAdd').removeClass('d-none'))
-  $('#alertModal').modal('hide');
-}
-
-function simpan(){
-
-  let form = $('#allform').children().toArray()
-  let dataForm = []
-  let error =''
-  
-  
-
-  form.map(e=>{
-    $(e).find('input').toArray().map(i=>{
-      if(!i.value){
-        error +=i.name+', '
+    function removeRow(me) {
+      if ($('#allform').children().length == 10) {
+        return;
       }
-    })
-    dataForm.push($(e).children().serializeArray())
-  })
+      temp = $(me).parent().parent().parent().parent()[0].id
+      $('#alertModal').modal('show');
 
-  // if(error){
-  //   alert('error  :'+error +'. input tidak benar!')
-  // }else{
-  
+    }
 
-    $.ajax({
-      type :'POST',
-      url:"<?php echo base_url() ?>admin/Dashboard/insert_data",
-      data:{
-        dataForm},
-      success:function(res){
-        console.log(res = "success");
-        // res = JSON.parse(res)
-  
-        if("success"){
-          // $('#allform').html(respond);
-          // alert('data berhasil di inputkan');
-          window.location.reload();
-    
-        }
-      },
-      error:function(error){
-        alert('Terjadi kesalahan: periksa inputan anda!');
+    function setAccept() {
+      $(`#${temp}`).remove();
+      console.log($('#allform').children().last().find('#btnAdd').removeClass('d-none'));
+      $('#alertModal').modal('hide');
+    }
+
+    function simpan() {
+
+      let form = $('#allform').children().toArray()
+      let dataForm = []
+      let error = ''
+      form.map(e => {
+        $(e).find('input').toArray().map(i => {
+          if (!i.value) {
+            error += i.name + ', '
+          }
+        })
+        dataForm.push($(e).children().serializeArray())
+      })
+
+      if (error) {
+        alert('error  :' + error + '. input tidak benar!')
+      } else {
+
+        $.ajax({
+          type: 'POST',
+          url: "<?php echo base_url() ?>admin/Form_faktur/insert_data",
+          data: {
+            dataForm,
+          },
+          success: function(res) {
+            console.log(res = "success");
+            // res = JSON.parse(res)
+
+            if ("success") {
+              // $('#allform').html(respond);
+              // alert('data berhasil di inputkan');
+              window.location.reload();
+
+            }
+          },
+          error: function(error) {
+            alert('Terjadi kesalahan: periksa inputan anda!');
+          }
+        })
       }
-    })
-  
 
-}
-  
-  
+    }
   </script>
 </body>
 

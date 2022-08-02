@@ -116,3 +116,25 @@ $db['database2'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
+
+$db['database3'] = array(
+	'dsn'	=> 'pgsql:host=172.27.1.9;port=5432;dbname=suz;',
+	'hostname' => '172.27.1.9',
+	'username' => 'suz',
+	'password' => 'suz45',
+	'database' => 'suz',
+	'dbdriver' => 'pdo',
+	'dbprefix' => '',
+	'pconnect' => FALSE,
+	'db_debug' => (ENVIRONMENT !== 'development'),
+	'cache_on' => FALSE,
+	'cachedir' => '',
+	'char_set' => 'utf8',
+	'dbcollat' => 'utf8_general_ci',
+	'swap_pre' => '',
+	'encrypt' => FALSE,
+	'compress' => FALSE,
+	'stricton' => FALSE,
+	'failover' => array(),
+	'save_queries' => TRUE
+);
