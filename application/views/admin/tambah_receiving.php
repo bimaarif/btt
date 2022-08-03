@@ -85,7 +85,7 @@
         </div>
       </div>
     </div> -->
-    
+
       <h5 class="my-3"></h5>
       <div class="float-left">
         <button type="button" onclick="addFormBtt()" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#exampleModal"><i class="fa-thin fa-plus"></i>tambah recieving</button>
@@ -187,11 +187,12 @@
             <form action="<?php echo base_url('admin/tambah_receiving/insert_receiving'); ?>" method="POST">
               <div class="form-group">
                 <label for="exampleInputEmail1">No. receiving</label>
-                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="No. receiving" name="no_rcv" required>
+                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="No. receiving" name="no_rcv" id="no_rcv" onChange='checkNoRcv(value)' required>
+                <span id="no_rcv-availability-status"></span>
               </div>
               <div class="form-group">
                 <label for="tagihan">total tagihan</label>
-                <input type="text" onKeyup="formatRupiah(this)"  class="form-control" placeholder="total tagihan" name="jml_tgh" required>
+                <input type="text" onKeyup="formatRupiah(this)" class="form-control" placeholder="total tagihan" name="jml_tgh" id="jml_tgh" readonly required>
               </div>
               <button type="submit" class="btn btn-primary">Submit</button>
             </form>
@@ -224,7 +225,54 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="{{asset('js/jquery.datetimepicker.full.min.js')}}"></script>
-    
+
+    <script>
+
+      $(document).on('keyup','#no_rcv',function() {
+          $('#no_rcv-availability-status').html('');   
+      });
+
+      function checkNoRcv(value) {
+
+        $.ajax({
+          type: "POST",
+          url: "<?php echo base_url('admin/tambah_receiving/validateRCV'); ?>",
+          data: {
+            norcv: value
+          },
+          success: function(res) {
+            // console.log(res);
+            const obj = JSON.parse(res);
+            if (obj.status == 200 && obj.message == 'success get data') {
+              $("#no_rcv-availability-status").html(obj.results);
+              $("#check_no_rcv").hide();
+            } else {
+              chekcToIdem(value);
+            }
+
+          }
+        });
+      }
+
+      function chekcToIdem(value) {
+        $.ajax({
+          type: "GET",
+          url: `http://szytoolsapi.suzuyagroup.com:8181/rcvheader/${value}`,
+          success: function(response) {
+            console.log(response);
+            if (response.status == 200 && response.message == 'success get data receiving') {
+              $('#jml_tgh').val(response.results[0].totalrcv);
+
+            } else if (response.status == 200 && response.message == 'data not found') {
+              $("#no_rcv-availability-status").html(response.results);
+              $("#check_no_rcv").hide();
+            }
+
+          }
+        })
+      }
+    </script>
+
     <script>
       let no = 1;
       let limit = 11;
@@ -338,7 +386,7 @@
 
       function setAccept() {
         $(`#${temp}`).remove();
-        console.log($('#allform').children().last().find('#btnAdd').removeClass('d-none'))
+        $('#allform').children().last().find('#btnAdd').removeClass('d-none')
         $('#alertModal').modal('hide');
       }
 

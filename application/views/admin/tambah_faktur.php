@@ -122,7 +122,7 @@
                       <td><?php echo number_format($f->tagihan); ?></td>
                       <td><?php echo $f->csv; ?></td>
                       <td>
-                          <a onclick="return confirm('yakin hapus')" href="<?= base_url(); ?>admin/tambah_faktur/hapus_faktur/<?= $f->id_faktur ?>"
+                          <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/tambah_faktur/hapus_faktur/<?= $f->id_faktur ?>"
                           class="btn btn-danger">hapus</a>
                       </td>
                     </tr>
