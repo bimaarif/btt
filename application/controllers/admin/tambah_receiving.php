@@ -23,6 +23,7 @@ class tambah_receiving extends CI_Controller
 
 			if (count($data) > 0) {
 				// var_dump($data); die;
+				$data['receiving'] = $this->bttModel->noRcv($no_btt)->result();
 				$data['no_btt'] =  $no_btt;
 				$this->load->view('templates_admin/header');
 				$this->load->view('templates_admin/sidebar');
@@ -31,6 +32,7 @@ class tambah_receiving extends CI_Controller
 			} 
 		} else {
 			$data['receiving'] = $this->bttModel->noRcv($no_btt)->result();
+			$data['no_btt'] =  $no_btt;
 			$this->load->view('templates_admin/header');
 			$this->load->view('templates_admin/sidebar');
 			$this->load->view('admin/tambah_receiving', $data);

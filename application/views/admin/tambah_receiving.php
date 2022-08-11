@@ -97,6 +97,7 @@
         <div class="card shadow mb-4">
           <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary"></h6>
+            <h5>No. BTT : <?php echo $no_btt; ?> </h5>
           </div>
           <div class="card-body">
             <div class="table-responsive">
@@ -106,6 +107,7 @@
                     <th>No</th>
                     <th>No. Recieving</th>
                     <th>Total Tagihan</th>
+                    <th>Tanggal Receiving</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -117,7 +119,17 @@
                     <tr>
                       <td><?php echo $no++; ?></td>
                       <td><?php echo $rcv->no_rcv; ?></td>
-                      <td><?php echo number_format($rcv->jml_tgh); ?></td>
+                      <td>
+                       <div class="row"> 
+                         <div class="col">
+                             <div style="text-align:left">Rp.</div>
+                         </div>
+                         <div class="col">
+                             <div style="text-align:right"><?php echo number_format($rcv->jml_tgh); ?></div>
+                         </div>
+                        </div> 
+                      </td>
+                      <td><?php echo $rcv->tgl_rcv;  ?></td>
                       <td>
                         <a href="<?php echo base_url().'admin/tambah_faktur/index/'.$rcv->no_rcv; ?>" type="button" class="btn btn-primary">input faktur</a>
                       </td>
@@ -187,7 +199,7 @@
           </div>
           <div class="modal-body">
             <form action="<?php echo base_url('admin/tambah_receiving/insert_receiving'); ?>" method="POST">
-              <input type="text" value="<?php echo $no_btt; ?>" name="no_btt" hidden>
+              <input type="text" value="<?php echo $no_btt; ?>" name="no_btt">
               <div class="form-group">
                 <label for="exampleInputEmail1">No. receiving</label>
                 <input type="text" class="form-control no_rcv" aria-describedby="emailHelp" placeholder="No. receiving" name="no_rcv" id="no_rcv" onChange='checkNoRcv(value)' required>

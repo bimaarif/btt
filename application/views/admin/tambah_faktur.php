@@ -10,6 +10,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="{{asset('css/jquery.datetimepicker.min.css')}}" />
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <title></title>
   <style>
     button:focus {
@@ -85,7 +86,7 @@
         </div>
       </div>
     </div> -->
-    
+
       <h5 class="my-3"></h5>
       <div class="float-left">
         <button type="button" onclick="addFormBtt()" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#tambahFaktur"><i class="fa-thin fa-plus"></i>tambah faktur</button>
@@ -97,7 +98,8 @@
         <div class="card shadow mb-4">
           <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary"></h6>
-            <?php echo $this->session->flashdata('message')?>
+            <h5>No. Receiving : <?php echo $no_rcv; ?> </h5>
+            <?php echo $this->session->flashdata('message') ?>
           </div>
           <div class="card-body">
             <div class="table-responsive">
@@ -113,22 +115,21 @@
                   </tr>
                 </thead>
                 <tbody>
-                <?php $no = 1;
-                  foreach ($faktur as $f) : ?>   
+                  <?php $no = 1;
+                  foreach ($faktur as $f) : ?>
                     <tr>
                       <td><?php echo $no++; ?></td>
                       <td><?php echo $f->no_faktur; ?></td>
                       <td><?php echo $f->fak_pjk; ?></td>
-                      <td><?php echo number_format($f->tagihan); ?></td>
+                      <td>Rp. <?php echo number_format($f->tagihan); ?></td>
                       <td><?php echo $f->csv; ?></td>
                       <td>
-                          <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/tambah_faktur/hapus_faktur/<?= $f->id_faktur.'/'. $no_rcv ?>"
-                          class="btn btn-danger">hapus</a>
+                        <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/tambah_faktur/hapus_faktur/<?= $f->id_faktur . '/' . $no_rcv ?>" class="btn btn-danger">hapus</a>
                       </td>
                     </tr>
-                <?php endforeach; ?>    
+                  <?php endforeach; ?>
                 </tbody>
-                 
+
               </table>
             </div>
           </div>
@@ -194,35 +195,36 @@
             <form action="<?php echo base_url('admin/tambah_faktur/simpan_faktur'); ?>" method="POST" enctype="multipart/form-data">
               <input type="text" value="<?php echo $no_rcv ?>" class="form-control" name="no_rcv" hidden>
               <div class="form-group">
-                <label>No. Faktur</label>
-                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="No. faktur" name="no_faktur" id="no_faktur" onChange='checkNoFaktur(value)' required>
+                <label>No. Faktur Supplier</label>
+                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Input Nomor Faktur Supplier" name="no_faktur" id="no_faktur" onChange='checkNoFaktur(value)' required>
                 <span id="no_faktur-availability-status" class="text-danger"></span>
               </div>
 
               <div class="form-group">
                 <label>Faktur Pajak</label>
-                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="faktur pajak" name="fak_pjk" id="fak_pjk"  onChange='checkNoFaktur(value)' required>
-                <span id="no_faktur-availability-status" class="text-danger"></span>
-              </div>
+                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Scan Qrcode Faktur Pajak" name="qrcode_pajak" id="qrcode1" onChange='barcodePajak(this)' required>
+                <div id="validationServerUsernameFeedback" class="invalid-feedback">
+                </div>
 
-              <div class="form-group">
-                 <!-- <label>Scan Qrcode</label> -->
-                 <!-- <input type="text" onChange="barcodePajak(this)" id="qrcode1" class="form-control qrcode" name="qrcode_pajak">              -->
-              </div>
+                <div class="form-group">
+                  <label>No. Faktur Pajak</label>
+                  <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="" name="no_faktur" id="no_fak_pjk" readonly required>
+                  <span id="no_faktur-availability-status" class="text-danger"></span>
+                </div>
 
-              <div class="form-group">
-                <label>Tagihan</label>
-                <input type="text" onKeyup="formatRupiah(this)"  class="form-control" placeholder="tagihan" name="tagihan" id="tagihan" required>
-                
-              </div>
+                <div class="form-group">
+                  <label>Total Faktur Pajak</label>
+                  <input type="text" onKeyup="formatRupiah(this)" class="form-control" placeholder="" name="tagihan" id="tagihan" readonly required>
 
-              <div class="form-group">
-                <label>Upload CSV</label>
-                <input type="file" id="file" onchange="checkfile(this);" class="form-control" placeholder="csv" name="csv" id="csv" accept=".csv" required>
-                <span class="text-danger">(hanya bisa upload file csv)</span>
-              </div>
+                </div>
 
-              <button type="submit" class="btn btn-primary">simpan</button>
+                <div class="form-group">
+                  <label>Upload CSV</label>
+                  <input type="file" id="file" onchange="checkfile(this);" class="form-control" placeholder="csv" name="csv" id="csv" accept=".csv" required>
+                  <span class="text-danger">(hanya bisa upload file csv)</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">simpan</button>
             </form>
           </div>
           <div class="modal-footer">
@@ -255,9 +257,8 @@
     <script src="{{asset('js/jquery.datetimepicker.full.min.js')}}"></script>
 
     <script>
-
-       const email  = document.querySelector('#email');
-       const submit = document.querySelector('#submit');
+      const email = document.querySelector('#email');
+      const submit = document.querySelector('#submit');
 
       //  submit.addEventListener('click',()=>{
       //     if(){
@@ -265,41 +266,39 @@
       //     }else
       //  }); 
 
-       function checkfile(sender) {
-            var validExts = new Array(".csv");
-            var fileExt = sender.value;
-            fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
-            if (validExts.indexOf(fileExt) < 0) {
-              alert("maaf hanya boleh upload file" +
-                      validExts.toString());
-              return false;
+      function checkfile(sender) {
+        var validExts = new Array(".csv");
+        var fileExt = sender.value;
+        fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+        if (validExts.indexOf(fileExt) < 0) {
+          alert("maaf hanya boleh upload file" +
+            validExts.toString());
+          return false;
+        } else return true;
+      }
+
+      function checkNoFaktur(value) {
+
+        $.ajax({
+          type: "POST",
+          url: "<?php echo base_url('admin/validateFaktur/validateFaktur'); ?>",
+          data: {
+            nofaktur: value
+          },
+          success: function(res) {
+            // console.log(res);
+            const obj = JSON.parse(res);
+            if (obj.status == 200 && obj.message == 'success get data') {
+              $("#no_faktur-availability-status").html(obj.results);
+              $("#check_no_rcv").hide();
+            } else {
+              $("#no_faktur-availability-status").html(obj.results);
+              $("#check_no_rcv").hide();
             }
-            else return true;
-       }
 
-       function checkNoFaktur(value) {
-
-          $.ajax({
-            type: "POST",
-            url: "<?php echo base_url('admin/validateFaktur/validateFaktur'); ?>",
-            data: {
-              nofaktur: value
-            },
-            success: function(res) {
-              // console.log(res);
-              const obj = JSON.parse(res);
-              if (obj.status == 200 && obj.message == 'success get data') {
-                $("#no_faktur-availability-status").html(obj.results);
-                $("#check_no_rcv").hide();
-              } else {
-                $("#no_faktur-availability-status").html(obj.results);
-                $("#check_no_rcv").hide();
-              }
-
-            }
-          });
-        }
-
+          }
+        });
+      }
     </script>
 
     <script>
@@ -310,27 +309,27 @@
       $(document).ready(function() {
         addRow();
 
-        $('#form_faktur').submit(function(){
-           let no_faktur = $('#no_faktur').val();
-           let fak_pjk = $('#fak_pjk').val();
-           let tagihan = $('#tagihan').val();
-           let csv = $('#csv').val();
+        $('#form_faktur').submit(function() {
+          let no_faktur = $('#no_faktur').val();
+          let fak_pjk = $('#fak_pjk').val();
+          let tagihan = $('#tagihan').val();
+          let csv = $('#csv').val();
 
-           if(no_faktur == ""){
-              swal("no faktur harus di isi","warning");
-              return false;
-           }else if(fak_pjk == ""){
-              swal("faktur pajak harus di isi","warning");
-              return false;
-           }else if(tagihan == ""){
-              swal("tagihan harus di isi","warning");
-              return false;
-           }else if(csv == ""){
-              swal("csv harus di upload","warning");
-              return false;
-           }else{
-              return true;
-           }
+          if (no_faktur == "") {
+            swal("no faktur harus di isi", "warning");
+            return false;
+          } else if (fak_pjk == "") {
+            swal("faktur pajak harus di isi", "warning");
+            return false;
+          } else if (tagihan == "") {
+            swal("tagihan harus di isi", "warning");
+            return false;
+          } else if (csv == "") {
+            swal("csv harus di upload", "warning");
+            return false;
+          } else {
+            return true;
+          }
 
         });
 
@@ -338,67 +337,57 @@
 
 
 
-      /* Fungsi formatRupiah */
-      function formatRupiah(me, prefix = 'Rp. ') {
-        // console.log(me[0].value)
-        let angka = me.value
-        var number_string = angka.replace(/[^,\d]/g, '').toString(),
-          split = number_string.split(','),
-          sisa = split[0].length % 3,
-          rupiah = split[0].substr(0, sisa),
-          ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-        // tambahkan titik jika yang di input sudah menjadi angka ribuan
-        if (ribuan) {
-          separator = sisa ? '.' : '';
-          rupiah += separator + ribuan.join('.');
-        }
-
-        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
-        me.value = prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
-        return
-      }
 
 
-      function barcodePajak(me){
+      function barcodePajak(me) {
         let link = me.value;
 
         $.ajax({
-           method :'POST',
-           url : "<?php echo base_url('admin/tambah_faktur/checkqrcode') ?>",
-           data : {
-              // me.value
-              link : link
-           },
-           success: function(res){
+          method: 'POST',
+          url: "<?php echo base_url('admin/tambah_faktur/checkqrcode') ?>",
+          data: {
+            // me.value
+            link: link
+          },
+          success: function(res) {
+            let data = JSON.parse(res);
 
-              data = JSON.parse(res);
-
-              if(data[0] == "success"){
-                 let tagihan = $('input[name=tagihan]').val(data[1]);
-                 let faktur  = $('input[name=no_faktur]').val(data[2][0]);
-                 formatRupiah(tagihan[0]);
-              }else if(data[0] == "fail"){
-                 alert("url tidak benar");
-                 let scan = $('input[name=qrcode_pajak]').val('');
-                 let tagihan = $('input[name=tagihan]').val('');
-                 let faktur = $('input[name=no_faktur]').val('');
-              }else if(data[0] == "ada"){
-                 alert("Faktur Pajak sudah pernah digunakan");
-                 let scan = $('input[name=qrcode_pajak]').val('');
-                 let tagihan = $('input[name=tagihan]').val('');
-                 let faktur = $('input[name=no_faktur]').val('');
+            if (data == true) {
+              Swal.fire({
+                icon: 'koneksi ke server sedang terganggu',
+                title: 'Oops...',
+                text: 'koneksi ke server sedang terganggu, silahkan ulangi lagi!',
+              })
+            } else if (data == "No service was found.0"){
+              // show modal alert
+              console.log(res);
+              alert('');
+            } else {
+              //  send to id no faktur and total faktur
+              // let data = JSON.parse(res);
+              if (data == true) {
+                 
               }else{
-                 alert("gagal terhubung ke koneksi DJP silahkan lakukan scan ulang");
-                 let scan = $('input[name=qrcode_pajak]').val('');
-                 let tagihan = $('input[name=tagihan]').val('');
-                 let faktur = $('input[name=no_faktur]').val('');
+                  console.log(data);
+
+                  var number_string = data.total.toString(),
+                  sisa = number_string.length % 3,
+                  rupiah = number_string.substr(0, sisa),
+                  ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+                if (ribuan){
+                  separator = sisa ? '.' : '';
+                  rupiah += separator + ribuan.join('.');
+                }
+                // console.log(data.no_faktur);
+                $('#no_fak_pjk').val(`010` + `${'.'}` + data.no_faktur);
+                $('#tagihan').val(`Rp. ` + rupiah);
               }
-           }
+
+            }
+          }
         });
       }
-
-
 
       // function barcodePajak(me) {
 

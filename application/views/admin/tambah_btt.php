@@ -55,6 +55,8 @@
                   <tr>
                     <th>No</th>
                     <th>No. BTT</th>
+                    <th>Tanggal</th>
+                    <th>status</th>
                     <th>action</th>
                   </tr>
                 </thead>
@@ -64,10 +66,29 @@
                     <tr>
                       <td><?php echo $no++; ?></td>
                       <td><?php echo $btt->no_btt; ?></td>
+                      <td><?php echo $btt->create_at; ?></td>
+                      <td>
+                        <?php 
+                          if ($btt->status == "unconfirm") {
+                            echo "<p class='badge badge-danger'>Unconfirm</p";
+                          } else {
+                            echo "<p class='badge badge-success'>Confirm</p";
+                          } ?>
+                        </td>
                       <td>
                         <!-- <a href="tambah_receiving" type="button" class="btn btn-primary" id="" onclick="getData">input receiving</a> -->
-
-                        <a type="button" href="<?php echo base_url().'admin/tambah_receiving/index/'.$btt->no_btt ?>" class="btn btn-primary">input receiving</a>
+                        <?php
+                        if ($btt->status == "unconfirm") {
+                        ?>
+                          <a href='<?php echo base_url() . 'admin/tambah_receiving/index/' . $btt->no_btt ?>' class='btn btn-primary'>Input Receiving</a>
+                        <?php
+                        } else {
+                        ?>
+                          <a href='' class='btn btn-success'>Print</a>
+                        <?php
+                        }
+                        ?>
+                        <!-- <a type="button" href="<?php echo base_url() . 'admin/tambah_receiving/index/' . $btt->no_btt ?>" class="btn btn-primary">input receiving</a> -->
                       </td>
                     </tr>
                   <?php endforeach; ?>
@@ -81,18 +102,18 @@
   </div>
 
   <script>
-    function getData(values){
-        $.ajax({
-          type: "POST",
-          url: "<?php echo base_url() ?>admin/tambah_receiving/index",
-          data: {
-             data : values
-          },
-          // dataType: "dataType",
-          success: function (response) {
-            $('body').empty().append(response)
-          }
-        });
+    function getData(values) {
+      $.ajax({
+        type: "POST",
+        url: "<?php echo base_url() ?>admin/tambah_receiving/index",
+        data: {
+          data: values
+        },
+        // dataType: "dataType",
+        success: function(response) {
+          $('body').empty().append(response)
+        }
+      });
     }
   </script>
 

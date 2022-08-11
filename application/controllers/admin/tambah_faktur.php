@@ -17,9 +17,9 @@ class tambah_faktur extends CI_Controller
 		// $checkReceiving = $this->bttModel->noFaktur($no_receiving)->result();
 
 		// if(count($checkReceiving) > 0){
-        //    $data['faktur'] = $this->bttModel->cekFaktur($checkReceiving[0]->no_rcv)->result();
+		//    $data['faktur'] = $this->bttModel->cekFaktur($checkReceiving[0]->no_rcv)->result();
 
-        //    if(count($data) > 0){
+		//    if(count($data) > 0){
 		// 	 $data['no_rcv'] = $no_receiving;
 		// 	 $this->load->view('templates_admin/header');
 		// 	 $this->load->view('templates_admin/sidebar');
@@ -33,10 +33,10 @@ class tambah_faktur extends CI_Controller
 		//    $this->load->view('admin/tambah_faktur', $data);
 		//    $this->load->view('templates_admin/footer'); 	
 		// }
-		
+
 		$data['faktur'] = $this->bttModel->noFaktur($no_receiving)->result();
-        $data['no_rcv'] = $no_receiving;
-		
+		$data['no_rcv'] = $no_receiving;
+
 		$this->load->view('templates_admin/header');
 		$this->load->view('templates_admin/sidebar');
 		$this->load->view('admin/tambah_faktur', $data);
@@ -113,68 +113,69 @@ class tambah_faktur extends CI_Controller
 
 	public function simpan_faktur()
 	{
-		    $no_rcv = $this->input->post('no_rcv');
-			$no_faktur = $this->input->post('no_faktur');
-			$faktur_pajak = $this->input->post('fak_pjk');
-			$tagihan = $this->input->post('tagihan');
+		$no_rcv = $this->input->post('no_rcv');
+		$no_faktur = $this->input->post('no_faktur');
+		$faktur_pajak = $this->input->post('fak_pjk');
+		$tagihan = $this->input->post('tagihan');
 
-			$tagihan = str_replace(['Rp', '.', ' '], '', $tagihan);
-			$tagihan = str_replace(',', '.', $tagihan);
+		$tagihan = str_replace(['Rp', '.', ' '], '', $tagihan);
+		$tagihan = str_replace(',', '.', $tagihan);
 
-			$csv = $_FILES['csv']['name'];
+		$csv = $_FILES['csv']['name'];
 
-			if ($csv = '') {
+		if ($csv = '') {
+		} else {
+			$config['upload_path'] = './assets/csv';
+			$config['allowed_types'] = 'csv';
+			$this->load->library('upload', $config);
+			if (!$this->upload->do_upload('csv')) {
+				echo "File gagal di upload";
 			} else {
-				$config['upload_path'] = './assets/csv';
-				$config['allowed_types'] = 'csv';
-				$this->load->library('upload', $config);
-				if (!$this->upload->do_upload('csv')) {
-					echo "File gagal di upload";
-				} else {
-					$csv = $this->upload->data('file_name');
-				}
+				$csv = $this->upload->data('file_name');
 			}
+		}
 
-			$data = array(
-				'no_rcv' => $no_rcv,
-				'no_faktur' => $no_faktur,
-				'fak_pjk' => $faktur_pajak,
-				'tagihan' => $tagihan,
-				'csv' => $csv
-			);
+		$data = array(
+			'no_rcv' => $no_rcv,
+			'no_faktur' => $no_faktur,
+			'fak_pjk' => $faktur_pajak,
+			'tagihan' => $tagihan,
+			'csv' => $csv
+		);
 
-			// $sql = "SELECT no_faktur, fak_pjk FROM tb_faktur";
-			// $cek = $this->db2->query($sql)->num_rows();
+		// $sql = "SELECT no_faktur, fak_pjk FROM tb_faktur";
+		// $cek = $this->db2->query($sql)->num_rows();
 
-			// if($cek > 0){
-			// 	echo "<script>window.alert('data faktur sudah ada')</script>";
-			// }else{
-                
-			    $this->bttModel->insert_faktur($data,'tb_faktur');
-			    $this->session->set_flashdata('message', '<div class="alert alert-success alert-dismissible  fade show" role="alert">
+		// if($cek > 0){
+		// 	echo "<script>window.alert('data faktur sudah ada')</script>";
+		// }else{
+
+		$this->bttModel->insert_faktur($data, 'tb_faktur');
+		$this->session->set_flashdata('message', '<div class="alert alert-success alert-dismissible  fade show" role="alert">
 		        <strong>Data Berhasil ditambahkan !</strong>
 		        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
 			      <span aria-hidden="true">&times;</span>
 		        </button>
 		        </div>');
-                
-				redirect('admin/tambah_faktur/index/'.$no_rcv);
-				
-			// }
-        
-			
-		
+
+		redirect('admin/tambah_faktur/index/' . $no_rcv);
+
+		// }
+
+
+
 	}
 
-	public function validateFaktur(){
-        try{
+	public function validateFaktur()
+	{
+		try {
 			$no_faktur    = $this->input->post('no_faktur');
 			$faktur_pajak = $this->input->post('fak_pjk');
 
 
-			$resultLocal = $this->bttModel->getByNoFaktur($no_faktur,$faktur_pajak);
+			$resultLocal = $this->bttModel->getByNoFaktur($no_faktur, $faktur_pajak);
 
-			if($resultLocal > 0){
+			if ($resultLocal > 0) {
 				$data = [
 					'status'  => 200,
 					'error'   => false,
@@ -182,23 +183,23 @@ class tambah_faktur extends CI_Controller
 					'results' => "<p class='text-danger'>no sudah ada, silahkan ganti dengan yang lain</p>"
 				];
 				echo json_encode($data);
-			}else{
-                $data = [
+			} else {
+				$data = [
 					'status'  => 404,
 					'error'   => false,
 					'message' => "Data Not Found"
 				];
 				echo json_encode($data);
 			}
-		}catch(Exception $e){
-            $data = [
+		} catch (Exception $e) {
+			$data = [
 				'status'  => 6500,
 				'error'   => true,
 				'message' => $e
 			];
 			echo json_encode($data);
-		}catch(Throwable $th){
-            $data = [
+		} catch (Throwable $th) {
+			$data = [
 				'status'  => 500,
 				'error'   => true,
 				'message' => $th
@@ -207,51 +208,79 @@ class tambah_faktur extends CI_Controller
 		}
 	}
 
-	public function hapus_faktur($id,$no_rcv)
-    {
-        $this->bttModel->hapusDataFaktur($id,$no_rcv);
+	public function hapus_faktur($id, $no_rcv)
+	{
+		$this->bttModel->hapusDataFaktur($id, $no_rcv);
 		// $data['no_rcv'] = $no_receiving;
-        $this->session->set_flashdata('message', '<div class="alert alert-danger alert-dismissible  fade show" role="alert">
+		$this->session->set_flashdata('message', '<div class="alert alert-danger alert-dismissible  fade show" role="alert">
 		<strong>Data Berhasil di hapus!</strong>
 		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 			<span aria-hidden="true">&times;</span>
 		</button>
 		</div>');
-        redirect(base_url('admin/tambah_faktur/index/'.$no_rcv));
-    }
+		redirect(base_url('admin/tambah_faktur/index/' . $no_rcv));
+	}
 
-    public function checkqrcode(){
+	public function checkqrcode()
+	{
 		$url = $this->input->post('link');
-		$cek = $this->db->query("SELECT * from tb_faktur WHERE qrcode_pajak='$url'")->result_array();
 
-		$hitung = count($cek);
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+		// curl_setopt($curl, CURLOPT_HTTPHEADER, $key_load);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+		// EXECUTE:
+		$result = curl_exec($curl);
+		curl_close($curl);
+		$data = simplexml_load_string($result);
 
-		if($hitung == 0){
-		   $curl = curl_init();
-		   curl_setopt($curl, CURLOPT_URL, $url);
-           curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-            // curl_setopt($curl, CURLOPT_HTTPHEADER, $key_load);
-           curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-            // EXECUTE:
-           $result = curl_exec($curl);
+        
+		if ($data->body . '0' == "No service was found.0") {
+			echo json_encode($data->body . '0' == "No service was found.0");
+		} else {
+			$faktur = $data->nomorFaktur;
+			$total = $data->jumlahDpp + $data->jumlahPpn;
 
-		   if(!$result){
-			 echo json_encode(array("fail"));
-		   }else{
-			 curl_close($curl);
-			 $data = simplexml_load_string($result);
-			 $total = $data->jumlahDpp + $data->jumlahPpn;
-			 $faktur = $data->nomorFaktur;
-
-			 if($total > 0){
-               echo json_encode(array("success", $data->jumlahDpp + $data->jumlahPpnm, $faktur));
-			 }else{
-               echo json_encode(array("err"));
-			 }
-		   }
-		}else{
-			echo json_encode(array("ada"));
+			$data= [
+				'no_faktur' => $faktur . "0",
+				'total' => $total
+			];
+			echo json_encode($data);
 		}
+
+		// die;
+
+		// $cek = $this->db->query("SELECT * from tb_faktur WHERE fak_pjk ='$url'")->result_array();
+
+		// $hitung = count($cek);
+
+		// if ($hitung == 0) {
+		// 	$curl = curl_init();
+		// 	curl_setopt($curl, CURLOPT_URL, $url);
+		// 	curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+		// 	// curl_setopt($curl, CURLOPT_HTTPHEADER, $key_load);
+		// 	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+		// 	// EXECUTE:
+		// 	$result = curl_exec($curl);
+
+		// 	if (!$result) {
+		// 		echo json_encode(array("fail"));
+		// 	} else {
+		// 		curl_close($curl);
+		// 		$data = simplexml_load_string($result);
+		// 		$total = $data->jumlahDpp + $data->jumlahPpn;
+		// 		$faktur = $data->nomorFaktur;
+
+		// 		if ($total > 0) {
+		// 			echo json_encode(array("success", $data->jumlahDpp + $data->jumlahPpnm, $faktur));
+		// 		} else {
+		// 			echo json_encode(array("err"));
+		// 		}
+		// 	}
+		// } else {
+		// 	echo json_encode(array("ada"));
+		// }
 	}
 
 

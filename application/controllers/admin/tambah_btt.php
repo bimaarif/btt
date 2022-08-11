@@ -35,6 +35,7 @@ class tambah_btt extends CI_Controller
     public function inputKode(){
         $batas = date('Ym').'.'.date('dHis');
         $kodetampil = "BTTT".'.'.$batas;
+        // $tgl_btt = date('dmy');
         $data['no_btt'] = $kodetampil;
 
         $this->bttModel->insert_nobtt($data,'tb_nobtt');
