@@ -41,6 +41,13 @@ class bttModel extends CI_model
         return $result->num_rows();
     }
 
+    public function getByNoFaktur($no_faktur,$faktur_pajak)
+    {
+        $sql = "SELECT no_faktur, fak_pjk, tagihan, csv FROM tb_faktur WHERE no_faktur = '$no_faktur' AND fak_pjk = '$faktur_pajak'";
+        $result = $this->db2->query($sql);
+        return $result->num_rows();
+    } 
+
     public function getRcvHeader($no_rcv)
     {
         var_dump($no_rcv);
@@ -60,17 +67,15 @@ class bttModel extends CI_model
     }
 
 
-
     public function insert_faktur($data, $table)
     {
-
-        $simpan = $this->db2->insert($table, $data);
-        return $simpan;
+            $simpan = $this->db2->insert($table, $data);  
+            return $simpan;
     }
 
-    public function hapusDataFaktur($id)
+    public function hapusDataFaktur($id,$no_rcv)
     {
-        $delete = $this->db2->delete('tb_faktur', ['id_faktur' => $id]);
+        $delete = $this->db2->delete('tb_faktur', ['id_faktur' => $id,'no_rcv' => $no_rcv]);
         return $delete;
     }
 
@@ -79,7 +84,7 @@ class bttModel extends CI_model
     {
         $no_fak = $data['no_rcv'];
         $jml_tagihan = $data['jml_tgh'];
-
+        $no_btt = $data['no_btt'];
         // $data = array(
         //     'no_rcv' => $no_fak,
         //     'jml_tgh' => $jml_tagihan
@@ -87,7 +92,7 @@ class bttModel extends CI_model
 
         // var_dump($data); die;
 
-        $sql = "INSERT INTO tb_rcv(no_rcv,jml_tgh)values('$no_fak','$jml_tagihan')";
+        $sql = "INSERT INTO tb_rcv(no_rcv,jml_tgh,no_btt)values('$no_fak','$jml_tagihan','$no_btt')";
         $simpan = $this->db2->query($sql);
 
         return $simpan;
@@ -140,5 +145,42 @@ class bttModel extends CI_model
         $batas = date('Ym') . '.' . date('dHis');
         $kodetampil = "BTTT" . '.' . $batas;
         return $kodetampil;
+    }
+
+    public function noRcv($no_btt){
+        $query = "SELECT * FROM tb_rcv WHERE tb_rcv.no_btt = '$no_btt'";
+        
+        $result = $this->db2->query($query);
+
+        return $result;
+    }
+    
+    public function noFaktur($no_rcv){
+        $query = "SELECT * FROM tb_faktur WHERE tb_faktur.no_rcv = '$no_rcv'";
+
+        $result = $this->db2->query($query);
+
+        return $result;
+    }
+
+    public function cekFaktur($no_rcv){
+        $query = "SELECT tb_rcv.no_btt,  tb_rcv.no_rcv, tb_faktur.no_faktur,  tb_faktur.fak_pjk, tb_faktur.tagihan, tb_faktur.csv 
+                  FROM tb_rcv LEFT JOIN tb_faktur ON tb_faktur.no_rcv = tb_rcv.no_rcv 
+                  WHERE tb_rcv.no_rcv = '$no_rcv'";
+
+        $result = $this->db2->query($query);
+        
+        return $result;
+    }
+    
+    public function cekRcv($no_btt){
+        $query = "SELECT tb_nobtt.no_btt, tb_rcv.no_rcv, tb_rcv.jml_tgh
+                  FROM tb_nobtt
+                  LEFT JOIN tb_rcv ON tb_rcv.no_btt = tb_nobtt.no_btt
+                  WHERE tb_nobtt.no_btt = '$no_btt'";
+        
+        $result = $this->db2->query($query);
+
+        return $result;
     }
 }

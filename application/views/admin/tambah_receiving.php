@@ -100,24 +100,26 @@
           </div>
           <div class="card-body">
             <div class="table-responsive">
-              <table class="table table-bordered" width="100%" cellspacing="0">
+              <table class="table table-bordered" width="100%" cellspacing="0" id="table">
                 <thead>
                   <tr>
                     <th>No</th>
-                    <th>no. Recieving</th>
-                    <th>total tagihan</th>
-                    <th>action</th>
+                    <th>No. Recieving</th>
+                    <th>Total Tagihan</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <?php $no = 1;
+             
+                  <?php 
+                  $no = 1;
                   foreach ($receiving as $rcv) : ?>
                     <tr>
                       <td><?php echo $no++; ?></td>
                       <td><?php echo $rcv->no_rcv; ?></td>
                       <td><?php echo number_format($rcv->jml_tgh); ?></td>
                       <td>
-                        <a href="<?php base_url(); ?>tambah_faktur" type="button" class="btn btn-primary">input faktur</a>
+                        <a href="<?php echo base_url().'admin/tambah_faktur/index/'.$rcv->no_rcv; ?>" type="button" class="btn btn-primary">input faktur</a>
                       </td>
                     </tr>
                   <?php endforeach; ?>
@@ -185,20 +187,21 @@
           </div>
           <div class="modal-body">
             <form action="<?php echo base_url('admin/tambah_receiving/insert_receiving'); ?>" method="POST">
+              <input type="text" value="<?php echo $no_btt; ?>" name="no_btt" hidden>
               <div class="form-group">
                 <label for="exampleInputEmail1">No. receiving</label>
-                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="No. receiving" name="no_rcv" id="no_rcv" onChange='checkNoRcv(value)' required>
-                <span id="no_rcv-availability-status"></span>
+                <input type="text" class="form-control no_rcv" aria-describedby="emailHelp" placeholder="No. receiving" name="no_rcv" id="no_rcv" onChange='checkNoRcv(value)' required>
+                <span id="no_rcv-availability-status" class="text-danger"></span>
               </div>
               <div class="form-group">
-                <label for="tagihan">total tagihan</label>
-                <input type="text" onKeyup="formatRupiah(this)" class="form-control" placeholder="total tagihan" name="jml_tgh" id="jml_tgh" readonly required>
+                <label for="tagihan">Total Nilai Receiving</label>
+                <input type="text" class="form-control" onKeyup="formatRupiah(this)" placeholder="total receiving" name="jml_tgh" id="jml_tgh" value="" readonly required>
               </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary">simpan</button>
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">batal</button>
           </div>
         </div>
       </div>
@@ -227,11 +230,25 @@
     <script src="{{asset('js/jquery.datetimepicker.full.min.js')}}"></script>
 
     <script>
+    
 
       $(document).on('keyup','#no_rcv',function() {
           $('#no_rcv-availability-status').html('');   
       });
 
+      // new AutoNumeric('#jml_tgh',{
+      //    decimalPlace : '2',
+      // });
+
+      // $(document).ready(function(){
+
+      //   $("#no_rcv").keyup(function(){
+      //     $("#no_rcv-availability-status").html('');
+      //   });
+
+
+      // });
+      
       function checkNoRcv(value) {
 
         $.ajax({
@@ -257,12 +274,11 @@
       function chekcToIdem(value) {
         $.ajax({
           type: "GET",
-          url: `http://szytoolsapi.suzuyagroup.com:8181/rcvheader/${value}`,
+          url: `http://szytoolsapi.suzuyagroup.com:8181/rcvheader/${value}/<?= $this->session->userdata('username'); ?>`,
           success: function(response) {
             console.log(response);
             if (response.status == 200 && response.message == 'success get data receiving') {
-              $('#jml_tgh').val(response.results[0].totalrcv);
-
+              $('#jml_tgh').val(response.results[0].totalrcv); 
             } else if (response.status == 200 && response.message == 'data not found') {
               $("#no_rcv-availability-status").html(response.results);
               $("#check_no_rcv").hide();
@@ -282,7 +298,6 @@
         addRow();
         
       });
-
 
 
       /* Fungsi formatRupiah */

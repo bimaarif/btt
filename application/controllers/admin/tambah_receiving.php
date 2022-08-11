@@ -1,4 +1,7 @@
 <?php
+
+// error_reporting(0);
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class tambah_receiving extends CI_Controller
@@ -10,15 +13,36 @@ class tambah_receiving extends CI_Controller
 		$this->load->model('idempModel');
 	}
 
-	public function index()
+	public function index($no_btt)
 	{
-		$db2 = $this->load->database('database2', TRUE);
-		$data['receiving'] = $this->bttModel->get_receiving('tb_rcv')->result();
+		$checkBtt = $this->bttModel->noRcv($no_btt)->result();
+       
+		// lakukan pengecekan no_btt
+		if (count($checkBtt) > 0) {
+			$data['receiving'] = $this->bttModel->cekRcv($checkBtt[0]->no_btt)->result();
+
+			if (count($data) > 0) {
+				// var_dump($data); die;
+				$data['no_btt'] =  $no_btt;
+				$this->load->view('templates_admin/header');
+				$this->load->view('templates_admin/sidebar');
+				$this->load->view('admin/tambah_receiving', $data);
+				$this->load->view('templates_admin/footer');
+			} 
+		} else {
+			$data['receiving'] = $this->bttModel->noRcv($no_btt)->result();
+			$this->load->view('templates_admin/header');
+			$this->load->view('templates_admin/sidebar');
+			$this->load->view('admin/tambah_receiving', $data);
+			$this->load->view('templates_admin/footer');
+		}
+
+
+
+
+		// $data['no_btt'] = $index;
 		// $data['receiving'] = $db2->query('SELECT no_rcv, jml_tgh FROM tb_rcv JOIN tb_faktur ON (tb_rcv.id_rcv = tb_faktur.id_rcv)')->result();
-		$this->load->view('templates_admin/header');
-		$this->load->view('templates_admin/sidebar');
-		$this->load->view('admin/tambah_receiving', $data);
-		$this->load->view('templates_admin/footer');
+
 	}
 
 	public function inputFaktur($id)
@@ -35,28 +59,31 @@ class tambah_receiving extends CI_Controller
 
 	public function insert_receiving()
 	{
-		$this->_rules();
 
-		if ($this->form_validation->run() == false) {
-			$this->index();
-		} else {
-			$receiving     = $this->input->post('no_rcv');
-			$total_tagihan = $this->input->post('jml_tgh');
 
-			$tagihan = str_replace(['Rp', '.', ' '], '', $total_tagihan);
-			$tagihan = str_replace(',', '.', $tagihan);
+		// if ($this->form_validation->run() == false) {
+		// 	$this->index();
+		// } else {
+		$receiving     = $this->input->post('no_rcv');
+		$total_tagihan = $this->input->post('jml_tgh');
+        $no_btt        = $this->input->post('no_btt');
 
-			$data = array(
-				'no_rcv' => $receiving,
-				'jml_tgh' => (float)$tagihan
-			);
 
-			$this->bttModel->insert_receiving($data, 'tb_rcv');
+		$tagihan = str_replace(['Rp', '.', ' '], '', $total_tagihan);
+		$tagihan = str_replace(',', '.', $tagihan);
 
-			//   var_dump($simpan); die;
+		$data = array(
+			'no_rcv' => $receiving,
+			'jml_tgh' => (float)$tagihan,
+            'no_btt' => $no_btt
+		);
 
-			redirect('admin/tambah_receiving');
-		}
+		$this->bttModel->insert_receiving($data, 'tb_rcv');
+
+		//   var_dump($simpan); die;
+
+		redirect('admin/tambah_receiving/index/'.$no_btt);
+		// }
 	}
 
 	public function rcvHeader()

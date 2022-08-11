@@ -89,7 +89,7 @@
       <h5 class="my-3"></h5>
       <div class="float-left">
         <button type="button" onclick="addFormBtt()" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#tambahFaktur"><i class="fa-thin fa-plus"></i>tambah faktur</button>
-        <a href="<?php echo base_url(); ?>admin/tambah_receiving" type="button" class="btn btn-primary btn-sm mb-3">kembali</a>
+        <a href="javascript:window.history.go(-1)" type="button" class="btn btn-primary btn-sm mb-3">kembali</a>
       </div>
 
       <div>
@@ -122,12 +122,13 @@
                       <td><?php echo number_format($f->tagihan); ?></td>
                       <td><?php echo $f->csv; ?></td>
                       <td>
-                          <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/tambah_faktur/hapus_faktur/<?= $f->id_faktur ?>"
+                          <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/tambah_faktur/hapus_faktur/<?= $f->id_faktur.'/'. $no_rcv ?>"
                           class="btn btn-danger">hapus</a>
                       </td>
                     </tr>
                 <?php endforeach; ?>    
                 </tbody>
+                 
               </table>
             </div>
           </div>
@@ -191,16 +192,22 @@
           </div>
           <div class="modal-body">
             <form action="<?php echo base_url('admin/tambah_faktur/simpan_faktur'); ?>" method="POST" enctype="multipart/form-data">
+              <input type="text" value="<?php echo $no_rcv ?>" class="form-control" name="no_rcv" hidden>
               <div class="form-group">
                 <label>No. Faktur</label>
-                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="No. faktur" name="no_faktur" id="no_faktur" required>
-                
+                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="No. faktur" name="no_faktur" id="no_faktur" onChange='checkNoFaktur(value)' required>
+                <span id="no_faktur-availability-status" class="text-danger"></span>
               </div>
 
               <div class="form-group">
                 <label>Faktur Pajak</label>
-                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="faktur pajak" name="fak_pjk" id="fak_pjk" required>
-                
+                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="faktur pajak" name="fak_pjk" id="fak_pjk"  onChange='checkNoFaktur(value)' required>
+                <span id="no_faktur-availability-status" class="text-danger"></span>
+              </div>
+
+              <div class="form-group">
+                 <!-- <label>Scan Qrcode</label> -->
+                 <!-- <input type="text" onChange="barcodePajak(this)" id="qrcode1" class="form-control qrcode" name="qrcode_pajak">              -->
               </div>
 
               <div class="form-group">
@@ -212,14 +219,14 @@
               <div class="form-group">
                 <label>Upload CSV</label>
                 <input type="file" id="file" onchange="checkfile(this);" class="form-control" placeholder="csv" name="csv" id="csv" accept=".csv" required>
-                (hanya bisa upload file csv)
+                <span class="text-danger">(hanya bisa upload file csv)</span>
               </div>
 
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary">simpan</button>
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">batal</button>
           </div>
         </div>
       </div>
@@ -269,6 +276,30 @@
             }
             else return true;
        }
+
+       function checkNoFaktur(value) {
+
+          $.ajax({
+            type: "POST",
+            url: "<?php echo base_url('admin/validateFaktur/validateFaktur'); ?>",
+            data: {
+              nofaktur: value
+            },
+            success: function(res) {
+              // console.log(res);
+              const obj = JSON.parse(res);
+              if (obj.status == 200 && obj.message == 'success get data') {
+                $("#no_faktur-availability-status").html(obj.results);
+                $("#check_no_rcv").hide();
+              } else {
+                $("#no_faktur-availability-status").html(obj.results);
+                $("#check_no_rcv").hide();
+              }
+
+            }
+          });
+        }
+
     </script>
 
     <script>
@@ -329,24 +360,63 @@
       }
 
 
-
-      function barcodePajak(me) {
+      function barcodePajak(me){
+        let link = me.value;
 
         $.ajax({
-          method: 'post',
-          url: "{{url('chekqrcode')}}",
-          data: {
-            _token: "{{ csrf_token() }}",
-            url: me.value
-          },
-          success: function(res) {
-            let tagihan = $(me).parent().parent().find('input[name=jumlah_tagihan]').val(res)
+           method :'POST',
+           url : "<?php echo base_url('admin/tambah_faktur/checkqrcode') ?>",
+           data : {
+              // me.value
+              link : link
+           },
+           success: function(res){
 
-            formatRupiah(tagihan[0])
-          }
-        })
+              data = JSON.parse(res);
 
+              if(data[0] == "success"){
+                 let tagihan = $('input[name=tagihan]').val(data[1]);
+                 let faktur  = $('input[name=no_faktur]').val(data[2][0]);
+                 formatRupiah(tagihan[0]);
+              }else if(data[0] == "fail"){
+                 alert("url tidak benar");
+                 let scan = $('input[name=qrcode_pajak]').val('');
+                 let tagihan = $('input[name=tagihan]').val('');
+                 let faktur = $('input[name=no_faktur]').val('');
+              }else if(data[0] == "ada"){
+                 alert("Faktur Pajak sudah pernah digunakan");
+                 let scan = $('input[name=qrcode_pajak]').val('');
+                 let tagihan = $('input[name=tagihan]').val('');
+                 let faktur = $('input[name=no_faktur]').val('');
+              }else{
+                 alert("gagal terhubung ke koneksi DJP silahkan lakukan scan ulang");
+                 let scan = $('input[name=qrcode_pajak]').val('');
+                 let tagihan = $('input[name=tagihan]').val('');
+                 let faktur = $('input[name=no_faktur]').val('');
+              }
+           }
+        });
       }
+
+
+
+      // function barcodePajak(me) {
+
+      //   $.ajax({
+      //     method: 'post',
+      //     url: "{{url('chekqrcode')}}",
+      //     data: {
+      //       _token: "{{ csrf_token() }}",
+      //       url: me.value
+      //     },
+      //     success: function(res) {
+      //       let tagihan = $(me).parent().parent().find('input[name=jumlah_tagihan]').val(res)
+
+      //       formatRupiah(tagihan[0])
+      //     }
+      //   })
+
+      // }
 
 
       function addRow(me = false) {

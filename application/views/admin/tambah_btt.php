@@ -37,8 +37,8 @@
       <h5 class="my-3"></h5>
       <div class="float-left">
         <form action="<?php base_url(); ?>tambah_btt/inputKode" method="POST">
-             <input type="hidden" class="form-control" aria-describedby="emailHelp" placeholder="" name="no_btt" id="no_btt" value="<?php echo $kode_btt; ?>">
-             <button type="submit" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#exampleModal" id="tambah_btt"><i class="fa-thin fa-plus"></i>Tambah BTT</button>
+          <input type="hidden" class="form-control" aria-describedby="emailHelp" placeholder="" name="no_btt" id="no_btt" value="<?php echo $kode_btt; ?>">
+          <button type="submit" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#exampleModal" id="tambah_btt"><i class="fa-thin fa-plus"></i>Tambah BTT</button>
         </form>
       </div>
       <hr>
@@ -54,21 +54,23 @@
                 <thead>
                   <tr>
                     <th>No</th>
-                    <th>no. BTT</th>
+                    <th>No. BTT</th>
                     <th>action</th>
                   </tr>
                 </thead>
                 <tbody>
-                <?php $no = 1;
-                  foreach ($tampil_btt as $btt) : ?>  
-                  <tr>
-                    <td><?php echo $no++; ?></td>
-                    <td><?php echo $btt->no_btt; ?></td>
-                    <td>
-                      <a href="<?php base_url(); ?>tambah_receiving" type="button" class="btn btn-primary">input receiving</a>
-                    </td>
-                  </tr>
-                <?php endforeach; ?>  
+                  <?php $no = 1;
+                  foreach ($tampil_btt as $btt) : ?>
+                    <tr>
+                      <td><?php echo $no++; ?></td>
+                      <td><?php echo $btt->no_btt; ?></td>
+                      <td>
+                        <!-- <a href="tambah_receiving" type="button" class="btn btn-primary" id="" onclick="getData">input receiving</a> -->
+
+                        <a type="button" href="<?php echo base_url().'admin/tambah_receiving/index/'.$btt->no_btt ?>" class="btn btn-primary">input receiving</a>
+                      </td>
+                    </tr>
+                  <?php endforeach; ?>
                 </tbody>
               </table>
             </div>
@@ -77,6 +79,22 @@
       </div>
     </div>
   </div>
+
+  <script>
+    function getData(values){
+        $.ajax({
+          type: "POST",
+          url: "<?php echo base_url() ?>admin/tambah_receiving/index",
+          data: {
+             data : values
+          },
+          // dataType: "dataType",
+          success: function (response) {
+            $('body').empty().append(response)
+          }
+        });
+    }
+  </script>
 
 
 
@@ -108,4 +126,5 @@
   </div> -->
   <!-- end -->
 </body>
+
 </html>
