@@ -3,7 +3,7 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 
-class tambah_faktur extends CI_Controller
+class faktur extends CI_Controller
 {
 
 	public function __construct()
@@ -14,33 +14,39 @@ class tambah_faktur extends CI_Controller
 
 	public function index($no_receiving)
 	{
-		// $checkReceiving = $this->bttModel->noFaktur($no_receiving)->result();
+		// var_dump($no_receiving);
+		// die;
+		$checkReceiving = $this->bttModel->noFaktur($no_receiving)->result();
 
-		// if(count($checkReceiving) > 0){
-		//    $data['faktur'] = $this->bttModel->cekFaktur($checkReceiving[0]->no_rcv)->result();
+		if (count($checkReceiving) > 0) {
+			$data['faktur'] = $this->bttModel->cekFaktur($checkReceiving[0]->no_rcv)->result();
+			// var_dump($data['faktur'][0]->no_btt);die;
 
-		//    if(count($data) > 0){
-		// 	 $data['no_rcv'] = $no_receiving;
-		// 	 $this->load->view('templates_admin/header');
-		// 	 $this->load->view('templates_admin/sidebar');
-		// 	 $this->load->view('admin/tambah_faktur', $data);
-		// 	 $this->load->view('templates_admin/footer');
-		//    }
-		// }else{
-		//    $data['faktur'] = $this->bttModel->nofaktur()->result();
-		//    $this->load->view('templates_admin/header');
-		//    $this->load->view('templates_admin/sidebar');
-		//    $this->load->view('admin/tambah_faktur', $data);
-		//    $this->load->view('templates_admin/footer'); 	
-		// }
+			if (count($data) > 0) {
+				$data['faktur'] = $this->bttModel->noFaktur($no_receiving)->result();
+				$data['no_rcv'] = $no_receiving;
+				// $data['no_bttt'] = $data['faktur'][0]->no_btt;
+				$this->load->view('templates_admin/header');
+				$this->load->view('templates_admin/sidebar');
+				$this->load->view('admin/view_faktur', $data);
+				$this->load->view('templates_admin/footer');
+			}
+		} else {
+			$data['faktur'] = $this->bttModel->noFaktur($no_receiving)->result();
+			$data['no_rcv'] = $no_receiving;
+			$this->load->view('templates_admin/header');
+			$this->load->view('templates_admin/sidebar');
+			$this->load->view('admin/view_faktur', $data);
+			$this->load->view('templates_admin/footer');
+		}
 
-		$data['faktur'] = $this->bttModel->noFaktur($no_receiving)->result();
-		$data['no_rcv'] = $no_receiving;
+		// $data['faktur'] = $this->bttModel->noFaktur($no_receiving)->result();
+		// $data['no_rcv'] = $no_receiving;
 
-		$this->load->view('templates_admin/header');
-		$this->load->view('templates_admin/sidebar');
-		$this->load->view('admin/tambah_faktur', $data);
-		$this->load->view('templates_admin/footer');
+		// $this->load->view('templates_admin/header');
+		// $this->load->view('templates_admin/sidebar');
+		// $this->load->view('admin/tambah_faktur', $data);
+		// $this->load->view('templates_admin/footer');
 	}
 
 	public function updateFaktur()
@@ -116,6 +122,7 @@ class tambah_faktur extends CI_Controller
 		$no_rcv = $this->input->post('no_rcv');
 		$no_faktur = $this->input->post('no_faktur');
 		$faktur_pajak = $this->input->post('fak_pjk');
+		$no_faktur_pajak = $this->input->post('no_fak_pjk');
 		$tagihan = $this->input->post('tagihan');
 
 		$tagihan = str_replace(['Rp', '.', ' '], '', $tagihan);
@@ -123,42 +130,55 @@ class tambah_faktur extends CI_Controller
 
 		$csv = $_FILES['csv']['name'];
 
-		if ($csv = '') {
+		// cek validasi data duplikat pada nomor faktur supplier
+		// $sql = "";
+		$sql = $this->db2->query("SELECT no_faktur FROM tb_faktur WHERE no_faktur = '$no_faktur'");
+		$cek = $sql->num_rows();
+
+		if ($cek > 0) {
+			$this->session->set_flashdata('message', '<div class="alert alert-warning alert-dismissible  fade show" role="alert">
+			<strong>nomor faktur supplier sudah digunakan</strong>
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+			</div>');
+			redirect('admin/faktur/index/' . $no_rcv);
 		} else {
-			$config['upload_path'] = './assets/csv';
-			$config['allowed_types'] = 'csv';
-			$this->load->library('upload', $config);
-			if (!$this->upload->do_upload('csv')) {
-				echo "File gagal di upload";
+			if ($csv = '') {
 			} else {
-				$csv = $this->upload->data('file_name');
+				$config['upload_path'] = './assets/csv';
+				$config['allowed_types'] = 'csv';
+				$this->load->library('upload', $config);
+				if (!$this->upload->do_upload('csv')) {
+					echo "File gagal di upload";
+				} else {
+					$csv = $this->upload->data('file_name');
+				}
 			}
+
+			$data = array(
+				'no_rcv' => $no_rcv,
+				'no_faktur' => $no_faktur,
+				'fak_pjk' => $faktur_pajak,
+				'no_fak_pjk' => $no_faktur_pajak,
+				'tagihan' => $tagihan,
+				'csv' => $csv
+			);
+
+
+
+			$this->bttModel->insert_faktur($data, 'tb_faktur');
+			$this->session->set_flashdata('message', '<div class="alert alert-success alert-dismissible  fade show" role="alert">
+					<strong>Data Berhasil ditambahkan !</strong>
+					<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					  <span aria-hidden="true">&times;</span>
+					</button>
+					</div>');
+
+			redirect('admin/faktur/index/' . $no_rcv);
 		}
 
-		$data = array(
-			'no_rcv' => $no_rcv,
-			'no_faktur' => $no_faktur,
-			'fak_pjk' => $faktur_pajak,
-			'tagihan' => $tagihan,
-			'csv' => $csv
-		);
 
-		// $sql = "SELECT no_faktur, fak_pjk FROM tb_faktur";
-		// $cek = $this->db2->query($sql)->num_rows();
-
-		// if($cek > 0){
-		// 	echo "<script>window.alert('data faktur sudah ada')</script>";
-		// }else{
-
-		$this->bttModel->insert_faktur($data, 'tb_faktur');
-		$this->session->set_flashdata('message', '<div class="alert alert-success alert-dismissible  fade show" role="alert">
-		        <strong>Data Berhasil ditambahkan !</strong>
-		        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-			      <span aria-hidden="true">&times;</span>
-		        </button>
-		        </div>');
-
-		redirect('admin/tambah_faktur/index/' . $no_rcv);
 
 		// }
 
@@ -218,7 +238,7 @@ class tambah_faktur extends CI_Controller
 			<span aria-hidden="true">&times;</span>
 		</button>
 		</div>');
-		redirect(base_url('admin/tambah_faktur/index/' . $no_rcv));
+		redirect(base_url('admin/faktur/index/' . $no_rcv));
 	}
 
 	public function checkqrcode()
@@ -235,14 +255,14 @@ class tambah_faktur extends CI_Controller
 		curl_close($curl);
 		$data = simplexml_load_string($result);
 
-        
+
 		if ($data->body . '0' == "No service was found.0") {
 			echo json_encode($data->body . '0' == "No service was found.0");
 		} else {
 			$faktur = $data->nomorFaktur;
 			$total = $data->jumlahDpp + $data->jumlahPpn;
 
-			$data= [
+			$data = [
 				'no_faktur' => $faktur . "0",
 				'total' => $total
 			];
@@ -283,6 +303,14 @@ class tambah_faktur extends CI_Controller
 		// }
 	}
 
+	public function sendConfirm()
+	{
+		$confirm = "Confirm";
+		$data['confirm'] = $confirm;
+		// $this->bttModel->insert_nobtt($data, 'tb_nobtt');
+
+		redirect('admin/tambah_btt');
+	}
 
 	public function _rules()
 	{

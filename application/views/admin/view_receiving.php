@@ -32,22 +32,6 @@
 </head>
 
 <body>
-  <header class="d-flex px-2 justify-content-between align-items-center w-100">
-    <!-- <div class="border-bottom">
-      <ul class="d-flex align-items-center list-unstyled text-decoration-none">
-        <li class="position-relative">
-          <a class="text-decoration-none" href="#" data-bs-toggle="modal" data-bs-target="#bttModal"><i class="fa-solid fa-plus"></i> Buat Form BTTT</a>
-        </li>
-        <li style="margin-left:20px;"><a class="text-decoration-none" href="{{url('/')}}"><i class="fa-solid fa-eye"></i> Lihat BTTT</a></li>
-      </ul>
-    </div> -->
-
-    <!-- <div class="py-3">
-      <a href="#" class=" fw-bold text-uppercase " style="outline-width: 0px; text-decoration: none; color: #636e72;" data-bs-toggle="modal" data-bs-target="#exampleModal"> &nbsp; <i class="fa-solid fa-caret-down"></i></a>
-
-    </div> -->
-
-  </header>
   <div class="container">
 
     <div class="row">
@@ -86,10 +70,9 @@
       </div>
     </div> -->
 
-      <h5 class="my-3"></h5>
       <div class="float-left">
         <button type="button" onclick="addFormBtt()" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#exampleModal"><i class="fa-thin fa-plus"></i>tambah recieving</button>
-        <a href="<?php echo base_url(); ?>admin/tambah_btt" type="button" class="btn btn-primary btn-sm mb-3">kembali</a>
+        <a href="<?php echo base_url(); ?>admin/btt" type="button" class="btn btn-primary btn-sm mb-3">kembali</a>
       </div>
 
       <div>
@@ -101,7 +84,7 @@
           </div>
           <div class="card-body">
             <div class="table-responsive">
-              <table class="table table-bordered" width="100%" cellspacing="0" id="table">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" id="table">
                 <thead>
                   <tr>
                     <th>No</th>
@@ -131,7 +114,7 @@
                       </td>
                       <td><?php echo $rcv->tgl_rcv;  ?></td>
                       <td>
-                        <a href="<?php echo base_url().'admin/tambah_faktur/index/'.$rcv->no_rcv; ?>" type="button" class="btn btn-primary">input faktur</a>
+                        <a href="<?php echo base_url().'admin/faktur/index/'.$rcv->no_rcv; ?>" type="button" class="btn btn-primary">input faktur</a>
                       </td>
                     </tr>
                   <?php endforeach; ?>
@@ -198,16 +181,20 @@
             </button>
           </div>
           <div class="modal-body">
-            <form action="<?php echo base_url('admin/tambah_receiving/insert_receiving'); ?>" method="POST">
-              <input type="text" value="<?php echo $no_btt; ?>" name="no_btt">
+            <form action="<?php echo base_url('admin/receiving/insert_receiving'); ?>" method="POST">
+              <input type="text" value="<?php echo $no_btt; ?>" name="no_btt" hidden>
               <div class="form-group">
                 <label for="exampleInputEmail1">No. receiving</label>
-                <input type="text" class="form-control no_rcv" aria-describedby="emailHelp" placeholder="No. receiving" name="no_rcv" id="no_rcv" onChange='checkNoRcv(value)' required>
+                <input type="text" class="form-control no_rcv" aria-describedby="emailHelp" placeholder="Masukkan Nomor Receiving" name="no_rcv" id="no_rcv" onChange='checkNoRcv(value)' required>
                 <span id="no_rcv-availability-status" class="text-danger"></span>
               </div>
               <div class="form-group">
                 <label for="tagihan">Total Nilai Receiving</label>
                 <input type="text" class="form-control" onKeyup="formatRupiah(this)" placeholder="total receiving" name="jml_tgh" id="jml_tgh" value="" readonly required>
+              </div>
+              <div class="form-group">
+                <label>Tanggal Receiving</label>
+                <input type="date" class="form-control" placeholder="masukkan tanggal receiving" name="tgl_rcv" id="tgl_rcv" required>
               </div>
               <button type="submit" class="btn btn-primary">simpan</button>
             </form>
@@ -265,7 +252,7 @@
 
         $.ajax({
           type: "POST",
-          url: "<?php echo base_url('admin/tambah_receiving/validateRCV'); ?>",
+          url: "<?php echo base_url('admin/receiving/validateRCV'); ?>",
           data: {
             norcv: value
           },
@@ -290,7 +277,16 @@
           success: function(response) {
             console.log(response);
             if (response.status == 200 && response.message == 'success get data receiving') {
-              $('#jml_tgh').val(response.results[0].totalrcv); 
+                var number_string = response.results[0].totalrcv.toString(),
+                  sisa = number_string.length % 3,
+                  rupiah = number_string.substr(0, sisa),
+                  ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+                if (ribuan){
+                  separator = sisa ? '.' : '';
+                  rupiah += separator + ribuan.join('.');
+                }
+              $('#jml_tgh').val(`Rp. ` + rupiah); 
             } else if (response.status == 200 && response.message == 'data not found') {
               $("#no_rcv-availability-status").html(response.results);
               $("#check_no_rcv").hide();

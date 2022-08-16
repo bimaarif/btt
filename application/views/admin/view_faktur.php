@@ -87,10 +87,10 @@
       </div>
     </div> -->
 
-      <h5 class="my-3"></h5>
       <div class="float-left">
         <button type="button" onclick="addFormBtt()" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#tambahFaktur"><i class="fa-thin fa-plus"></i>tambah faktur</button>
         <a href="javascript:window.history.go(-1)" type="button" class="btn btn-primary btn-sm mb-3">kembali</a>
+        <!-- <a href="<?php base_url() ?>admin/receiving/index/<?php echo "BTTT.202208.12043510"; ?>" type="button" class="btn btn-primary btn-sm mb-3">kembali</a> -->
       </div>
 
       <div>
@@ -98,7 +98,17 @@
         <div class="card shadow mb-4">
           <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary"></h6>
-            <h5>No. Receiving : <?php echo $no_rcv; ?> </h5>
+            
+            <div class="row">
+               <div class="col">
+                 <h5>No. Receiving : <?php echo $no_rcv; ?> </h5>
+               </div>
+               <div class="col">
+                   <!-- <input type="text" name="status" value="" hidden> -->
+                   <a href="<?php echo base_url() ?>admin/btt" class="btn btn-danger" style="position:absolute; right:10px;" id="selesai">selesai</a>
+               </div>
+            </div>
+            <br>
             <?php echo $this->session->flashdata('message') ?>
           </div>
           <div class="card-body">
@@ -109,6 +119,7 @@
                     <th>No</th>
                     <th>No. Faktur</th>
                     <th>Faktur Pajak</th>
+                    <!-- <th>No. Faktur Pajak</th> -->
                     <th>Tagihan</th>
                     <th>CSV</th>
                     <th>action</th>
@@ -124,12 +135,11 @@
                       <td>Rp. <?php echo number_format($f->tagihan); ?></td>
                       <td><?php echo $f->csv; ?></td>
                       <td>
-                        <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/tambah_faktur/hapus_faktur/<?= $f->id_faktur . '/' . $no_rcv ?>" class="btn btn-danger">hapus</a>
+                        <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/faktur/hapus_faktur/<?= $f->id_faktur .'/'. $no_rcv ?>" class="btn btn-danger">hapus</a>
                       </td>
                     </tr>
                   <?php endforeach; ?>
-                </tbody>
-
+                </tbody>  
               </table>
             </div>
           </div>
@@ -192,23 +202,22 @@
             </button>
           </div>
           <div class="modal-body">
-            <form action="<?php echo base_url('admin/tambah_faktur/simpan_faktur'); ?>" method="POST" enctype="multipart/form-data">
-              <input type="text" value="<?php echo $no_rcv ?>" class="form-control" name="no_rcv" hidden>
+            <form action="<?php echo base_url('admin/faktur/simpan_faktur'); ?>" method="POST" enctype="multipart/form-data">
+              <input type="text" value="<?php echo $no_rcv?>" class="form-control" name="no_rcv" hidden>
               <div class="form-group">
                 <label>No. Faktur Supplier</label>
                 <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Input Nomor Faktur Supplier" name="no_faktur" id="no_faktur" onChange='checkNoFaktur(value)' required>
-                <span id="no_faktur-availability-status" class="text-danger"></span>
               </div>
 
               <div class="form-group">
                 <label>Faktur Pajak</label>
-                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Scan Qrcode Faktur Pajak" name="qrcode_pajak" id="qrcode1" onChange='barcodePajak(this)' required>
+                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Scan Qrcode Faktur Pajak" name="fak_pjk" id="qrcode1" onChange='barcodePajak(this)' required>
                 <div id="validationServerUsernameFeedback" class="invalid-feedback">
                 </div>
 
                 <div class="form-group">
                   <label>No. Faktur Pajak</label>
-                  <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="" name="no_faktur" id="no_fak_pjk" readonly required>
+                  <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="" name="no_fak_pjk" id="no_fak_pjk" readonly required>
                   <span id="no_faktur-availability-status" class="text-danger"></span>
                 </div>
 
@@ -224,7 +233,7 @@
                   <span class="text-danger">(hanya bisa upload file csv)</span>
                 </div>
 
-                <button type="submit" class="btn btn-primary">simpan</button>
+                <button type="submit" class="btn btn-primary" id="simpanFaktur">simpan</button>
             </form>
           </div>
           <div class="modal-footer">
@@ -257,14 +266,15 @@
     <script src="{{asset('js/jquery.datetimepicker.full.min.js')}}"></script>
 
     <script>
-      const email = document.querySelector('#email');
-      const submit = document.querySelector('#submit');
+      
+      $(document).ready(function() {
+        if (($.trim($("tbody").html()) == "")){
+            $("#selesai").hide();
+        }else{
+            $("#selesai").show();
+        }         
+      });
 
-      //  submit.addEventListener('click',()=>{
-      //     if(){
-
-      //     }else
-      //  }); 
 
       function checkfile(sender) {
         var validExts = new Array(".csv");
@@ -344,7 +354,7 @@
 
         $.ajax({
           method: 'POST',
-          url: "<?php echo base_url('admin/tambah_faktur/checkqrcode') ?>",
+          url: "<?php echo base_url('admin/faktur/checkqrcode') ?>",
           data: {
             // me.value
             link: link
@@ -354,10 +364,13 @@
 
             if (data == true) {
               Swal.fire({
-                icon: 'koneksi ke server sedang terganggu',
-                title: 'Oops...',
-                text: 'koneksi ke server sedang terganggu, silahkan ulangi lagi!',
-              })
+                position: 'top-end',
+                icon: 'error',
+                title: 'maaf koneksi ke server terputus, coba ulangi lagi',
+                showConfirmButton: false,
+                timer: 3000
+              });
+              $('#qrcode1').val('');
             } else if (data == "No service was found.0"){
               // show modal alert
               console.log(res);

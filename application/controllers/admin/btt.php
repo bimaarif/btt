@@ -2,7 +2,7 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class tambah_btt extends CI_Controller
+class btt extends CI_Controller
 {
 
 	public function __construct(){
@@ -16,7 +16,7 @@ class tambah_btt extends CI_Controller
         $data['tampil_btt'] = $this->bttModel->get_nobtt('tb_nobtt')->result();
         $this->load->view('templates_admin/header');
 		$this->load->view('templates_admin/sidebar');
-		$this->load->view('admin/tambah_btt', $data);
+		$this->load->view('admin/view_btt', $data);
 		$this->load->view('templates_admin/footer');
     }
 
@@ -40,6 +40,6 @@ class tambah_btt extends CI_Controller
 
         $this->bttModel->insert_nobtt($data,'tb_nobtt');
 
-        redirect('admin/tambah_btt');     
+        redirect('admin/btt');     
     }
 }

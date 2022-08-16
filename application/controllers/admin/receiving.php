@@ -4,7 +4,7 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class tambah_receiving extends CI_Controller
+class receiving extends CI_Controller
 {
 
 	public function __construct()
@@ -15,8 +15,9 @@ class tambah_receiving extends CI_Controller
 
 	public function index($no_btt)
 	{
+
 		$checkBtt = $this->bttModel->noRcv($no_btt)->result();
-       
+
 		// lakukan pengecekan no_btt
 		if (count($checkBtt) > 0) {
 			$data['receiving'] = $this->bttModel->cekRcv($checkBtt[0]->no_btt)->result();
@@ -27,15 +28,15 @@ class tambah_receiving extends CI_Controller
 				$data['no_btt'] =  $no_btt;
 				$this->load->view('templates_admin/header');
 				$this->load->view('templates_admin/sidebar');
-				$this->load->view('admin/tambah_receiving', $data);
+				$this->load->view('admin/view_receiving', $data);
 				$this->load->view('templates_admin/footer');
-			} 
+			}
 		} else {
 			$data['receiving'] = $this->bttModel->noRcv($no_btt)->result();
 			$data['no_btt'] =  $no_btt;
 			$this->load->view('templates_admin/header');
 			$this->load->view('templates_admin/sidebar');
-			$this->load->view('admin/tambah_receiving', $data);
+			$this->load->view('admin/view_receiving', $data);
 			$this->load->view('templates_admin/footer');
 		}
 
@@ -66,25 +67,28 @@ class tambah_receiving extends CI_Controller
 		// if ($this->form_validation->run() == false) {
 		// 	$this->index();
 		// } else {
+		$no_btt        = $this->input->post('no_btt');
 		$receiving     = $this->input->post('no_rcv');
 		$total_tagihan = $this->input->post('jml_tgh');
-        $no_btt        = $this->input->post('no_btt');
+		$tgl_rcv       = $this->input->post('tgl_rcv');
+
 
 
 		$tagihan = str_replace(['Rp', '.', ' '], '', $total_tagihan);
 		$tagihan = str_replace(',', '.', $tagihan);
 
 		$data = array(
+			'no_btt' => $no_btt,
 			'no_rcv' => $receiving,
 			'jml_tgh' => (float)$tagihan,
-            'no_btt' => $no_btt
+			'tgl_rcv' => $tgl_rcv,
 		);
 
 		$this->bttModel->insert_receiving($data, 'tb_rcv');
 
 		//   var_dump($simpan); die;
 
-		redirect('admin/tambah_receiving/index/'.$no_btt);
+		redirect('admin/receiving/index/' . $no_btt);
 		// }
 	}
 

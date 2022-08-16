@@ -34,14 +34,12 @@
 <body>
   <div class="container">
     <div class="row">
-      <h5 class="my-3"></h5>
       <div class="float-left">
-        <form action="<?php base_url(); ?>tambah_btt/inputKode" method="POST">
+        <form action="<?php base_url(); ?>btt/inputKode" method="POST">
           <input type="hidden" class="form-control" aria-describedby="emailHelp" placeholder="" name="no_btt" id="no_btt" value="<?php echo $kode_btt; ?>">
-          <button type="submit" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#exampleModal" id="tambah_btt"><i class="fa-thin fa-plus"></i>Tambah BTT</button>
+          <button type="submit" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#exampleModal" id="tambah_btt"><i class="fa-thin fa-plus"></i>Tambah BTTT</button>
         </form>
       </div>
-      <hr>
       <div>
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
@@ -50,11 +48,11 @@
           </div>
           <div class="card-body">
             <div class="table-responsive">
-              <table class="table table-bordered" width="100%" cellspacing="0">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                   <tr>
                     <th>No</th>
-                    <th>No. BTT</th>
+                    <th>No. BTTT</th>
                     <th>Tanggal</th>
                     <th>status</th>
                     <th>action</th>
@@ -68,19 +66,21 @@
                       <td><?php echo $btt->no_btt; ?></td>
                       <td><?php echo $btt->create_at; ?></td>
                       <td>
-                        <?php 
-                          if ($btt->status == "unconfirm") {
-                            echo "<p class='badge badge-danger'>Unconfirm</p";
-                          } else {
-                            echo "<p class='badge badge-success'>Confirm</p";
-                          } ?>
-                        </td>
+                        <?php
+                        if ($btt->status == "Create") {
+                          echo "<p class='badge badge-warning'>Create</p";
+                        } else if ($btt->status == "Unconfirm") {
+                          echo "<p class='badge badge-danger'>Unconfirm</p";
+                        } else {
+                          echo "<p class='badge badge-success'>Confirm</p";
+                        } ?>
+                      </td>
                       <td>
                         <!-- <a href="tambah_receiving" type="button" class="btn btn-primary" id="" onclick="getData">input receiving</a> -->
                         <?php
-                        if ($btt->status == "unconfirm") {
+                        if ($btt->status == "Unconfirm"  || $btt->status == "Create") {
                         ?>
-                          <a href='<?php echo base_url() . 'admin/tambah_receiving/index/' . $btt->no_btt ?>' class='btn btn-primary'>Input Receiving</a>
+                          <a href='<?php echo base_url() . 'admin/receiving/index/' . $btt->no_btt ?>' class='btn btn-primary'>Input Receiving</a>
                         <?php
                         } else {
                         ?>
@@ -88,7 +88,7 @@
                         <?php
                         }
                         ?>
-                        <!-- <a type="button" href="<?php echo base_url() . 'admin/tambah_receiving/index/' . $btt->no_btt ?>" class="btn btn-primary">input receiving</a> -->
+                        <!-- <a type="button" href="<?php echo base_url() . 'admin/receiving/index/' . $btt->no_btt ?>" class="btn btn-primary">input receiving</a> -->
                       </td>
                     </tr>
                   <?php endforeach; ?>
@@ -105,7 +105,7 @@
     function getData(values) {
       $.ajax({
         type: "POST",
-        url: "<?php echo base_url() ?>admin/tambah_receiving/index",
+        url: "<?php echo base_url() ?>admin/receiving/index",
         data: {
           data: values
         },

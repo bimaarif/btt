@@ -39,7 +39,7 @@ class login extends CI_Controller
 				$this->session->set_userdata('fullname', $cek->row()->fullname);
 
 
-				redirect('admin/tambah_btt');
+				redirect('admin/btt');
 			}
 		}
 	}
