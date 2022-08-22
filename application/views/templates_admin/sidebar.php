@@ -8,7 +8,8 @@
 
       <!-- Sidebar - Brand -->
       <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
-        <div class="sidebar-brand-text mx-3"><?php echo $this->session->userdata('fullname'); ?></div>
+        <img src="<?php echo base_url(); ?>assets/img/suzuya-group.png" width="70px" class="img-fluid" alt="Responsive image">
+        <div class="sidebar-brand-text mx-3"></div>
       </a>
 
       <!-- Divider -->
@@ -53,21 +54,21 @@
           </button>
 
           <!-- Topbar Search -->
-          <h4 class="font-weight-bold"><?php
-                      
-              ?></h4>
+          <span class="mr-2 d-none d-lg-inline text-gray-600 small align-right"><?php echo $this->session->userdata('username'); ?></span>
 
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">
 
 
-            <div class="topbar-divider d-none d-sm-block"></div>
-
+            <div class="topbar-divider d-none d-sm-block">
+            
+            </div>
+          
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">
-              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                <?php //echo $this->session->userdata('username'); ?> 
+                <?php echo $this->session->userdata('fullname'); ?>
                 </span>
                 <!-- <img class="img-profile rounded-circle" src=""> -->
               </a>

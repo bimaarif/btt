@@ -10,30 +10,36 @@ class faktur extends CI_Controller
 	{
 		parent::__construct();
 		$this->db2 = $this->load->database('database2', TRUE);
+		$this->load->model('FakturModel');
 	}
 
-	public function index($no_receiving)
+	public function index($no_rcv)
 	{
-		// var_dump($no_receiving);
+		// var_dump($no_rcv);
 		// die;
-		$checkReceiving = $this->bttModel->noFaktur($no_receiving)->result();
+		$checkReceiving = $this->bttModel->noFaktur($no_rcv)->result();
 
 		if (count($checkReceiving) > 0) {
 			$data['faktur'] = $this->bttModel->cekFaktur($checkReceiving[0]->no_rcv)->result();
-			// var_dump($data['faktur'][0]->no_btt);die;
+			$noBtt = $data['faktur'][0]->no_btt;
+			// var_dump($noBtt);
 
 			if (count($data) > 0) {
-				$data['faktur'] = $this->bttModel->noFaktur($no_receiving)->result();
-				$data['no_rcv'] = $no_receiving;
-				// $data['no_bttt'] = $data['faktur'][0]->no_btt;
+				$data['faktur'] = $this->bttModel->noFaktur($no_rcv)->result();
+				$data['no_rcv'] = $no_rcv;
+				$data['no_bttt'] = $noBtt;
 				$this->load->view('templates_admin/header');
 				$this->load->view('templates_admin/sidebar');
 				$this->load->view('admin/view_faktur', $data);
 				$this->load->view('templates_admin/footer');
 			}
 		} else {
-			$data['faktur'] = $this->bttModel->noFaktur($no_receiving)->result();
-			$data['no_rcv'] = $no_receiving;
+
+			$data['faktur'] = $this->bttModel->noFaktur($no_rcv)->result();
+			$data['no_rcv'] = $no_rcv;
+			$data['no_bttt'] = $no_rcv;
+			// var_dump($no_rcv);
+			
 			$this->load->view('templates_admin/header');
 			$this->load->view('templates_admin/sidebar');
 			$this->load->view('admin/view_faktur', $data);
@@ -303,13 +309,17 @@ class faktur extends CI_Controller
 		// }
 	}
 
-	public function sendConfirm()
+	public function updateStatus($no_btt,$no_rcv)
 	{
-		$confirm = "Confirm";
-		$data['confirm'] = $confirm;
-		// $this->bttModel->insert_nobtt($data, 'tb_nobtt');
-
-		redirect('admin/tambah_btt');
+		// var_dump($no_btt);
+		// var_dump($no_rcv); 
+		// die;
+		$result = $this->FakturModel->updateStatus($no_btt);
+		if ($result) {
+			redirect('admin/btt/index'); 
+		} else {
+            redirect('admin/faktur/index/'.$no_rcv);
+		}
 	}
 
 	public function _rules()

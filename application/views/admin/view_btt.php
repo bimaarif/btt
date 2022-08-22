@@ -8,8 +8,10 @@
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <!-- <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous"> -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link rel="stylesheet" href="{{asset('css/jquery.datetimepicker.min.css')}}" />
+
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <title></title>
   <style>
     button:focus {
@@ -35,8 +37,8 @@
   <div class="container">
     <div class="row">
       <div class="float-left">
-        <form action="<?php base_url(); ?>btt/inputKode" method="POST">
-          <input type="hidden" class="form-control" aria-describedby="emailHelp" placeholder="" name="no_btt" id="no_btt" value="<?php echo $kode_btt; ?>">
+        <form action="<?php echo base_url('admin/btt/inputKode'); ?>" method="POST">
+          <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="" name="no_btt" id="no_btt" value="<?php echo $kode_btt; ?>" hidden>
           <button type="submit" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#exampleModal" id="tambah_btt"><i class="fa-thin fa-plus"></i>Tambah BTTT</button>
         </form>
       </div>
@@ -45,6 +47,7 @@
         <div class="card shadow mb-4">
           <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary"></h6>
+            <div id="cetak"></div>
           </div>
           <div class="card-body">
             <div class="table-responsive">
@@ -78,16 +81,21 @@
                       <td>
                         <!-- <a href="tambah_receiving" type="button" class="btn btn-primary" id="" onclick="getData">input receiving</a> -->
                         <?php
-                        if ($btt->status == "Unconfirm"  || $btt->status == "Create") {
+                        if ($btt->status == "Confirm") {
+                        ?>
+                          <button class='btn btn-success' onclick="gotoPrint('<?php echo $btt->no_btt; ?>')">Print</button>
+                        <?php
+                        } else if ($btt->status == "Unconfirm") {
                         ?>
                           <a href='<?php echo base_url() . 'admin/receiving/index/' . $btt->no_btt ?>' class='btn btn-primary'>Input Receiving</a>
+                          <button class='btn btn-success' onclick="gotoPrint('<?php echo $btt->no_btt; ?>')">Print</button>
+                          <!-- <button class='btn btn-success' data-toggle="modal" data-target="#print">Print</button> -->
+                          <!-- <button class="btn btn-success" data-toggle="modal" onclick='sampleButton();'>Print</button> -->
                         <?php
-                        } else {
+                        } else if ($btt->status == "Create") {
                         ?>
-                          <a href='' class='btn btn-success'>Print</a>
-                        <?php
-                        }
-                        ?>
+                          <a href='<?php echo base_url() . 'admin/receiving/index/' . $btt->no_btt ?>' class='btn btn-primary'>Input Receiving</a>
+                        <?php } ?>
                         <!-- <a type="button" href="<?php echo base_url() . 'admin/receiving/index/' . $btt->no_btt ?>" class="btn btn-primary">input receiving</a> -->
                       </td>
                     </tr>
@@ -96,6 +104,25 @@
               </table>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="print" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered ">
+      <div class="modal-content">
+
+        <div class="modal-body text-center">
+          <h4 class="">Yakin ingin melakukan print?</h4>
+          <h4 class="">Jika anda melakukan print, maka anda tidak bisa melakukan input receiving dan faktur</h4>
+          <!-- <button onclick="setAccept()" type="button" class="btn btn-primary ml-3" style="width: 100px;">Ya</button> -->
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Tidak</button>
+
+          <button class="btn btn-primary" onclick="sb(this)">Ya</button>
         </div>
       </div>
     </div>
@@ -114,6 +141,54 @@
           $('body').empty().append(response)
         }
       });
+    }
+
+
+    function gotoPrint(values) {
+      Swal.fire({
+        title: 'Yakin ingin melakukan print?',
+        text: "Jika anda melakukan print, maka anda tidak bisa melakukan input receiving dan faktur",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Swal.fire(
+          //   'Deleted!',
+          //   'Your file has been deleted.',
+          //   'success'
+          // )
+          $.ajax({
+            type: "POST",
+            url: "<?php echo base_url() ?>admin/btt/updateConfirm/" + values + "/<?php echo "Confirm"; ?>",
+            success: function(response) {
+              var convert = JSON.parse(response);
+              if (convert.status == 200) {
+                $.ajax({
+                  type: "POST",
+                  url: "<?php echo base_url('admin/btt/getDataPrint/'); ?>" + values,
+                  success: function(data) {
+                    // var cvt = JSON.parse(res);
+                    // var convert = JSON.parse(response);
+                    // if (convert.status == 200) {
+                    //     // console.log('berhasil');
+                    // }
+                    // location.reload();
+                    console.log(data);
+  
+                 }
+                });
+                // print();
+                // location.reload();
+              } else {
+                // location.reload();
+              }
+            }
+          });
+        }
+      })
     }
   </script>
 

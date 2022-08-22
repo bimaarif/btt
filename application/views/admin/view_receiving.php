@@ -112,7 +112,7 @@
                          </div>
                         </div> 
                       </td>
-                      <td><?php echo $rcv->tgl_rcv;  ?></td>
+                      <td><?php echo date("d-m-y",strtotime($rcv->tgl_rcv));  ?></td>
                       <td>
                         <a href="<?php echo base_url().'admin/faktur/index/'.$rcv->no_rcv; ?>" type="button" class="btn btn-primary">input faktur</a>
                       </td>
@@ -194,7 +194,7 @@
               </div>
               <div class="form-group">
                 <label>Tanggal Receiving</label>
-                <input type="date" class="form-control" placeholder="masukkan tanggal receiving" name="tgl_rcv" id="tgl_rcv" required>
+                <input type="date" class="form-control" placeholder="masukkan tanggal receiving" name="tgl_rcv" id="tgl_rcv" readonly required>
               </div>
               <button type="submit" class="btn btn-primary">simpan</button>
             </form>
@@ -278,15 +278,20 @@
             console.log(response);
             if (response.status == 200 && response.message == 'success get data receiving') {
                 var number_string = response.results[0].totalrcv.toString(),
-                  sisa = number_string.length % 3,
-                  rupiah = number_string.substr(0, sisa),
-                  ribuan = number_string.substr(sisa).match(/\d{3}/g);
+                    sisa = number_string.length % 3,
+                    rupiah = number_string.substr(0, sisa),
+                    ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+                var rcv_date = response.results[0].rcvdate.toString();     
 
                 if (ribuan){
                   separator = sisa ? '.' : '';
                   rupiah += separator + ribuan.join('.');
                 }
-              $('#jml_tgh').val(`Rp. ` + rupiah); 
+
+              $('#jml_tgh').val(`Rp. ` + rupiah);
+              $('#tgl_rcv').val(rcv_date);
+
             } else if (response.status == 200 && response.message == 'data not found') {
               $("#no_rcv-availability-status").html(response.results);
               $("#check_no_rcv").hide();

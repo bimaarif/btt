@@ -89,8 +89,9 @@
 
       <div class="float-left">
         <button type="button" onclick="addFormBtt()" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#tambahFaktur"><i class="fa-thin fa-plus"></i>tambah faktur</button>
-        <a href="javascript:window.history.go(-1)" type="button" class="btn btn-primary btn-sm mb-3">kembali</a>
-        <!-- <a href="<?php base_url() ?>admin/receiving/index/<?php echo "BTTT.202208.12043510"; ?>" type="button" class="btn btn-primary btn-sm mb-3">kembali</a> -->
+        <!-- <a href="javascript:window.history.go(-1)" type="button" class="btn btn-primary btn-sm mb-3">kembali</a> -->
+        <!-- <?php var_dump($no_bttt); ?> -->
+        <a href="<?php echo base_url().'admin/receiving/index/'.$no_bttt; ?>" type="button" class="btn btn-primary btn-sm mb-3">kembali</a>
       </div>
 
       <div>
@@ -105,7 +106,7 @@
                </div>
                <div class="col">
                    <!-- <input type="text" name="status" value="" hidden> -->
-                   <a href="<?php echo base_url() ?>admin/btt" class="btn btn-danger" style="position:absolute; right:10px;" id="selesai">selesai</a>
+                   <a href="<?php echo base_url() ?>admin/faktur/updateStatus/<?php echo $no_bttt ?>/<?php echo $no_rcv ?>" class="btn btn-danger" style="position:absolute; right:10px;" id="selesai">selesai</a>
                </div>
             </div>
             <br>
@@ -206,12 +207,12 @@
               <input type="text" value="<?php echo $no_rcv?>" class="form-control" name="no_rcv" hidden>
               <div class="form-group">
                 <label>No. Faktur Supplier</label>
-                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Input Nomor Faktur Supplier" name="no_faktur" id="no_faktur" onChange='checkNoFaktur(value)' required>
+                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Input Nomor Faktur Supplier" name="no_faktur" id="no_faktur" onChange='checkNoFaktur(value)' autofocus required>
               </div>
 
               <div class="form-group">
-                <label>Faktur Pajak</label>
-                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Scan Qrcode Faktur Pajak" name="fak_pjk" id="qrcode1" onChange='barcodePajak(this)' required>
+                <label id="qr_code">Faktur Pajak</label>
+                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Scan Qrcode Faktur Pajak" name="fak_pjk" id="qrcode1" onChange='barcodePajak(this)' autofocus required>
                 <div id="validationServerUsernameFeedback" class="invalid-feedback">
                 </div>
 
