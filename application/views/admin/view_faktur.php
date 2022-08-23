@@ -91,7 +91,7 @@
         <button type="button" onclick="addFormBtt()" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#tambahFaktur"><i class="fa-thin fa-plus"></i>tambah faktur</button>
         <!-- <a href="javascript:window.history.go(-1)" type="button" class="btn btn-primary btn-sm mb-3">kembali</a> -->
         <!-- <?php var_dump($no_bttt); ?> -->
-        <a href="<?php echo base_url().'admin/receiving/index/'.$no_bttt; ?>" type="button" class="btn btn-primary btn-sm mb-3">kembali</a>
+        <a href="<?php echo base_url().'admin/receiving/index/'.$no_bttt.'/'.$no_rcv; ?>" type="button" class="btn btn-primary btn-sm mb-3">kembali</a>
       </div>
 
       <div>
@@ -206,12 +206,12 @@
             <form action="<?php echo base_url('admin/faktur/simpan_faktur'); ?>" method="POST" enctype="multipart/form-data">
               <input type="text" value="<?php echo $no_rcv?>" class="form-control" name="no_rcv" hidden>
               <div class="form-group">
-                <label>No. Faktur Supplier</label>
+                <label for="no_faktur">No. Faktur Supplier</label>
                 <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Input Nomor Faktur Supplier" name="no_faktur" id="no_faktur" onChange='checkNoFaktur(value)' autofocus required>
               </div>
 
               <div class="form-group">
-                <label id="qr_code">Faktur Pajak</label>
+                <label id="qrcode1">Faktur Pajak</label>
                 <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Scan Qrcode Faktur Pajak" name="fak_pjk" id="qrcode1" onChange='barcodePajak(this)' autofocus required>
                 <div id="validationServerUsernameFeedback" class="invalid-feedback">
                 </div>

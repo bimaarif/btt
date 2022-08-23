@@ -52,24 +52,38 @@ class btt extends CI_Controller
 
     public function getDataPrint($no_btt)
     {
-
         $resultData = $this->bttModel->cetak($no_btt);
         $resultTotal = $this->bttModel->getTotal($no_btt);
 
+        //  var_dump($resultData);
+        //  var_dump($resultTotal);
+        //  var_dump($no_btt); die;
+        
+        // var_dump($printPdf); die;
         if ($resultData && $resultTotal) {
+
+            //   var_dump($resultData);
+            //   var_dump($resultTotal);
+            //   var_dump($no_btt); die;
             $printPdf = $this->printPdf($resultData, $resultTotal, $no_btt);
+
+            // var_dump($printPdf); die;
+            // return $printPdf;
+            // var_dump($printPdf); die;
+
             if ($printPdf) {
                 $data = [
                     'status' => 200,
                     'message' => 'Success'
                 ];
+            //    var_dump($printPdf); die;
             } else {
                 $data = [
                     'status' => 400,
                     'message' => 'Failed'
                 ];
             }
-            echo json_encode($data);
+            // echo json_encode($data);
         } else {
             $data = [
                 'status' => 400,
@@ -95,6 +109,7 @@ class btt extends CI_Controller
         // echo json_encode($resultData);
 
         // // $pdf->Output();
+        // ob_start();
         $no = 1;
         $user = $this->session->userdata('fullname');
         $newdate = date("d/m/Y");
@@ -195,7 +210,8 @@ class btt extends CI_Controller
         $pdf->Cell(20, 10, 'Medan, ' . $crt, 0, 0, 'L');
 
         // return $pdf->Output('BTTT_Report.pdf','D');
-        return $pdf->Output('BTTT_Report.pdf','D');
+        $pdf->Output('BTTT_Report.pdf','I');
+        // ob_end_flush();
         // $pdf->Output();
     }
 

@@ -9,6 +9,7 @@ class faktur extends CI_Controller
 	public function __construct()
 	{
 		parent::__construct();
+		checklogin();
 		$this->db2 = $this->load->database('database2', TRUE);
 		$this->load->model('FakturModel');
 	}
@@ -188,9 +189,31 @@ class faktur extends CI_Controller
 
 		// }
 
-
-
 	}
+
+
+	public function pecahCsv($string)
+	{
+		$data = array();
+
+		// Splits
+		$rows = explode("\n", trim($string));
+		$headings = explode(',', array_shift($rows));
+		foreach ($rows as $row)
+		{
+			// The substr removes " from start and end
+			$data_fields = explode('","', trim(substr($row, 1, -1)));
+	
+			if (count($data_fields) == count($headings))
+			{
+				$data[] = array_combine($headings, $data_fields);
+			}
+		}
+	
+		return $data;
+	}
+
+
 
 	public function validateFaktur()
 	{
