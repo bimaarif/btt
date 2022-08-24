@@ -137,6 +137,7 @@ class faktur extends CI_Controller
 
 		$csv = $_FILES['csv']['name'];
 
+
 		// cek validasi data duplikat pada nomor faktur supplier
 		// $sql = "";
 		$sql = $this->db2->query("SELECT no_faktur FROM tb_faktur WHERE no_faktur = '$no_faktur'");
@@ -160,6 +161,12 @@ class faktur extends CI_Controller
 					echo "File gagal di upload";
 				} else {
 					$csv = $this->upload->data('file_name');
+                    
+					$pecahCsv = array_map('str_getcsv', file(base_url().'/assets/csv/'. $csv));
+
+				    $pecahFile = $pecahCsv[1];
+
+		            print_r($pecahFile); die;
 				}
 			}
 
@@ -273,6 +280,8 @@ class faktur extends CI_Controller
 	public function checkqrcode()
 	{
 		$url = $this->input->post('link');
+
+		
 
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_URL, $url);

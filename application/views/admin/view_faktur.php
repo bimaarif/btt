@@ -211,7 +211,7 @@
               </div>
 
               <div class="form-group">
-                <label id="qrcode1">Faktur Pajak</label>
+                <label>Qrcode Faktur Pajak</label>
                 <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Scan Qrcode Faktur Pajak" name="fak_pjk" id="qrcode1" onChange='barcodePajak(this)' autofocus required>
                 <div id="validationServerUsernameFeedback" class="invalid-feedback">
                 </div>

@@ -17,4 +17,10 @@ class FakturModel extends CI_model
         $result = $this->db2->query($sql);
         return $result;
     }
+
+    public function validasiQrcode($no_faktur){
+        $sql = "SELECT fak_pjk FROM tb_faktur WHERE no_faktur = '$no_faktur'";
+        $result = $this->db2->query($sql);
+        return $result;
+    }
 }
