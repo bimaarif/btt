@@ -40,7 +40,7 @@ class faktur extends CI_Controller
 			$data['no_rcv'] = $no_rcv;
 			$data['no_bttt'] = $no_rcv;
 			// var_dump($no_rcv);
-			
+
 			$this->load->view('templates_admin/header');
 			$this->load->view('templates_admin/sidebar');
 			$this->load->view('admin/view_faktur', $data);
@@ -126,6 +126,7 @@ class faktur extends CI_Controller
 
 	public function simpan_faktur()
 	{
+		$kode_supplier = $this->session->userdata('username');
 		$no_rcv = $this->input->post('no_rcv');
 		$no_faktur = $this->input->post('no_faktur');
 		$faktur_pajak = $this->input->post('fak_pjk');
@@ -140,17 +141,17 @@ class faktur extends CI_Controller
 
 		// cek validasi data duplikat pada nomor faktur supplier
 		// $sql = "";
-		$sql = $this->db2->query("SELECT no_faktur FROM tb_faktur WHERE no_faktur = '$no_faktur'");
-		$cek = $sql->num_rows();
-
+		$sqlCekFaktur = $this->db2->query("SELECT no_faktur, fak_pjk FROM tb_faktur WHERE no_faktur = '$no_faktur'");
+		$cek = $sqlCekFaktur->num_rows();
 		if ($cek > 0) {
 			$this->session->set_flashdata('message', '<div class="alert alert-warning alert-dismissible  fade show" role="alert">
-			<strong>nomor faktur supplier sudah digunakan</strong>
+			<strong>nomor faktur supplier atau url sudah digunakan</strong>
 			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 			  <span aria-hidden="true">&times;</span>
 			</button>
 			</div>');
 			redirect('admin/faktur/index/' . $no_rcv);
+
 		} else {
 			if ($csv = '') {
 			} else {
@@ -161,12 +162,63 @@ class faktur extends CI_Controller
 					echo "File gagal di upload";
 				} else {
 					$csv = $this->upload->data('file_name');
+
+					$pecahCsv = array_map('str_getcsv', file(base_url() . '/assets/csv/' . $csv));
+
+					echo "<pre>";
+					echo print_r($pecahCsv); die;
+					echo "</pre>";
+                     
+					foreach($pecahCsv as $key => $values){
+						$cekCount = count($values);
+
+						var_dump($values); die;
+
+						if($key > 0){
+                            if($cekCount == 12){
+								
+							}
+						}
+					}
                     
-					$pecahCsv = array_map('str_getcsv', file(base_url().'/assets/csv/'. $csv));
+					// $pecahFile  = $pecahCsv[1][0];
+					// $pecahFile1 = $pecahCsv[1][1];
+					
 
-				    $pecahFile = $pecahCsv[1];
+					$ccv = count($pecahCsv);
+					// $nama_brg = $pecahCsv[1][6];
+					// $qty = $pecahCsv[1][7];
+                    // $hrg = $pecahCsv[1][8];
+					// $disc = $pecahCsv[1][9];
+                    // $ppn = $pecahCsv[1][10];
+					// $total = $pecahCsv[1][11];
 
-		            print_r($pecahFile); die;
+					// $query = "INSERT INTO csv_detail (fak_supp, kode_supp, nama_brg, qty, harga, disc, ppn, total) values ($no_faktur, $kode_supplier, $nama_brg, $qty, $hrg, $disc, $ppn, $total)";
+
+					// $simpan = $this->db2->query($query);
+
+					// var_dump($query); die;
+                   
+
+					// echo "<pre>";
+
+					// print_r($nama_brg);
+					// echo "<br>";
+					// print_r($qty);
+					// echo "<br>";
+					// print_r($hrg);
+					// echo "<br>";
+					// print_r($disc);
+					// echo "<br>";
+					// print_r($ppn);
+					// echo "<br>";
+					// print_r($total);
+					// die;
+					// echo "</pre>";
+
+					// $query = "INSERT INTO csv_detail (fak_supp, kode_supp, nama_brg, qty, harga, disc, ppn, date) values ()";
+
+
 				}
 			}
 
@@ -206,17 +258,15 @@ class faktur extends CI_Controller
 		// Splits
 		$rows = explode("\n", trim($string));
 		$headings = explode(',', array_shift($rows));
-		foreach ($rows as $row)
-		{
+		foreach ($rows as $row) {
 			// The substr removes " from start and end
 			$data_fields = explode('","', trim(substr($row, 1, -1)));
-	
-			if (count($data_fields) == count($headings))
-			{
+
+			if (count($data_fields) == count($headings)) {
 				$data[] = array_combine($headings, $data_fields);
 			}
 		}
-	
+
 		return $data;
 	}
 
@@ -281,7 +331,7 @@ class faktur extends CI_Controller
 	{
 		$url = $this->input->post('link');
 
-		
+
 
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_URL, $url);
@@ -341,16 +391,16 @@ class faktur extends CI_Controller
 		// }
 	}
 
-	public function updateStatus($no_btt,$no_rcv)
+	public function updateStatus($no_btt, $no_rcv)
 	{
 		// var_dump($no_btt);
 		// var_dump($no_rcv); 
 		// die;
 		$result = $this->FakturModel->updateStatus($no_btt);
 		if ($result) {
-			redirect('admin/btt/index'); 
+			redirect('admin/btt/index');
 		} else {
-            redirect('admin/faktur/index/'.$no_rcv);
+			redirect('admin/faktur/index/' . $no_rcv);
 		}
 	}
 
