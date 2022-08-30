@@ -91,7 +91,7 @@
         <button type="button" onclick="addFormBtt()" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#tambahFaktur"><i class="fa-thin fa-plus"></i>tambah faktur</button>
         <!-- <a href="javascript:window.history.go(-1)" type="button" class="btn btn-primary btn-sm mb-3">kembali</a> -->
         <!-- <?php var_dump($no_bttt); ?> -->
-        <a href="<?php echo base_url().'admin/receiving/index/'.$no_bttt.'/'.$no_rcv; ?>" type="button" class="btn btn-primary btn-sm mb-3">kembali</a>
+        <a href="<?php echo base_url() . 'admin/receiving/index/' . $no_bttt . '/' . $no_rcv; ?>" type="button" class="btn btn-primary btn-sm mb-3">kembali</a>
       </div>
 
       <div>
@@ -99,15 +99,15 @@
         <div class="card shadow mb-4">
           <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary"></h6>
-            
+
             <div class="row">
-               <div class="col">
-                 <h5>No. Receiving : <?php echo $no_rcv; ?> </h5>
-               </div>
-               <div class="col">
-                   <!-- <input type="text" name="status" value="" hidden> -->
-                   <a href="<?php echo base_url() ?>admin/faktur/updateStatus/<?php echo $no_bttt ?>/<?php echo $no_rcv ?>" class="btn btn-danger" style="position:absolute; right:10px;" id="selesai">selesai</a>
-               </div>
+              <div class="col">
+                <h5>No. Receiving : <?php echo $no_rcv; ?> </h5>
+              </div>
+              <div class="col">
+                <!-- <input type="text" name="status" value="" hidden> -->
+                <a href="<?php echo base_url() ?>admin/faktur/updateStatus/<?php echo $no_bttt ?>/<?php echo $no_rcv ?>" class="btn btn-danger" style="position:absolute; right:10px;" id="selesai">selesai</a>
+              </div>
             </div>
             <br>
             <?php echo $this->session->flashdata('message') ?>
@@ -136,11 +136,11 @@
                       <td>Rp. <?php echo number_format($f->tagihan); ?></td>
                       <td><?php echo $f->csv; ?></td>
                       <td>
-                        <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/faktur/hapus_faktur/<?= $f->id_faktur .'/'. $no_rcv ?>" class="btn btn-danger">hapus</a>
+                        <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/faktur/hapus_faktur/<?= $f->id_faktur . '/' . $no_rcv ?>" class="btn btn-danger">hapus</a>
                       </td>
                     </tr>
                   <?php endforeach; ?>
-                </tbody>  
+                </tbody>
               </table>
             </div>
           </div>
@@ -204,15 +204,17 @@
           </div>
           <div class="modal-body">
             <form action="<?php echo base_url('admin/faktur/simpan_faktur'); ?>" method="POST" enctype="multipart/form-data">
-              <input type="text" value="<?php echo $no_rcv?>" class="form-control" name="no_rcv" hidden>
+              <input type="text" value="<?php echo $no_rcv ?>" class="form-control" name="no_rcv" hidden>
               <div class="form-group">
                 <label for="no_faktur">No. Faktur Supplier</label>
-                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Input Nomor Faktur Supplier" name="no_faktur" id="no_faktur" onChange='checkNoFaktur(value)' autofocus required>
+                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Input Nomor Faktur Supplier" name="no_faktur" id="no_faktur" onChange='checkNoFakturSupplier(value)' autofocus required>
+                <span id="no_fak_supp-availability-status" class="text-danger"></span>
               </div>
 
               <div class="form-group">
                 <label>Qrcode Faktur Pajak</label>
-                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Scan Qrcode Faktur Pajak" name="fak_pjk" id="qrcode1" onChange='barcodePajak(this)' autofocus required>
+                <input type="text" class="form-control fak_pjk" aria-describedby="emailHelp" placeholder="Scan Qrcode Faktur Pajak" name="fak_pjk" id="qrcode1" onChange='barcodePajak(this)' autofocus required>
+                <span id="scan-Qrcode-availability-status" class="text-danger"></span>
                 <div id="validationServerUsernameFeedback" class="invalid-feedback">
                 </div>
 
@@ -223,7 +225,7 @@
                 </div>
 
                 <div class="form-group">
-                  <label>Total Faktur Pajak</label>
+                  <label>Total Harga Faktur Pajak</label>
                   <input type="text" onKeyup="formatRupiah(this)" class="form-control" placeholder="" name="tagihan" id="tagihan" readonly required>
 
                 </div>
@@ -267,13 +269,34 @@
     <script src="{{asset('js/jquery.datetimepicker.full.min.js')}}"></script>
 
     <script>
-      
       $(document).ready(function() {
-        if (($.trim($("tbody").html()) == "")){
-            $("#selesai").hide();
-        }else{
-            $("#selesai").show();
-        }         
+        if (($.trim($("tbody").html()) == "")) {
+          $("#selesai").hide();
+        } else {
+          $("#selesai").show();
+        }
+
+        $('#qrcode1').keyup(function() {
+          let faktur_pajak = $('#qrcode1').val();
+          if (faktur_pajak == 0) {
+            $('#scan-Qrcode-availability-status').text('');
+          } else {
+            $.ajax({
+              url: '<?php echo base_url('admin/faktur/validateScanQrcode'); ?>',
+              type: 'POST',
+              data: {
+                fak_pjk: faktur_pajak
+              },
+              success: function(hasil) {
+                const obj = JSON.parse(hasil);
+                if (obj.status == 200 && obj.message == 'success get data') {
+                  $('#scan-Qrcode-availability-status').html(obj.results);
+                }
+              }
+            });
+          }
+        });
+
       });
 
 
@@ -288,23 +311,25 @@
         } else return true;
       }
 
-      function checkNoFaktur(value) {
+
+      $(document).on('keyup', '#no_faktur', function() {
+        $('#no_fak_supp-availability-status').html('');
+      });
+
+      function checkNoFakturSupplier(value) {
 
         $.ajax({
           type: "POST",
-          url: "<?php echo base_url('admin/validateFaktur/validateFaktur'); ?>",
+          url: "<?php echo base_url('admin/faktur/validateFakturSupplier'); ?>",
           data: {
-            nofaktur: value
+            no_faktur: value
           },
           success: function(res) {
             // console.log(res);
             const obj = JSON.parse(res);
             if (obj.status == 200 && obj.message == 'success get data') {
-              $("#no_faktur-availability-status").html(obj.results);
-              $("#check_no_rcv").hide();
-            } else {
-              $("#no_faktur-availability-status").html(obj.results);
-              $("#check_no_rcv").hide();
+              $("#no_fak_supp-availability-status").html(obj.results);
+              $("#no_faktur").val('');
             }
 
           }
@@ -347,11 +372,14 @@
       });
 
 
-
+      $(document).on('keyup', '.no_faktur', function() {
+        $('#scan-Qrcode-availability-status').html('');
+      });
 
 
       function barcodePajak(me) {
         let link = me.value;
+
 
         $.ajax({
           method: 'POST',
@@ -363,6 +391,23 @@
           success: function(res) {
             let data = JSON.parse(res);
 
+            $.ajax({
+              type: "POST",
+              url: "<?php echo base_url('admin/faktur/validateScanQrcode'); ?>",
+              data: {
+                no_faktur: data
+              },
+              success: function(res) {
+                // console.log(res);
+                const obj = JSON.parse(res);
+                if (obj.status == 200 && obj.message == 'success get data') {
+                  $("#no_fak_supp-availability-status").html(obj.results);
+                  $("#no_faktur").val('');
+                }
+
+              }
+            });
+
             if (data == true) {
               Swal.fire({
                 position: 'top-end',
@@ -371,8 +416,8 @@
                 showConfirmButton: false,
                 timer: 3000
               });
-              $('#qrcode1').val('');
-            } else if (data == "No service was found.0"){
+              $('#qrcode1').val('').focus();
+            } else if (data == "No service was found.0") {
               // show modal alert
               console.log(res);
               alert('');
@@ -380,16 +425,16 @@
               //  send to id no faktur and total faktur
               // let data = JSON.parse(res);
               if (data == true) {
-                 
-              }else{
-                  console.log(data);
 
-                  var number_string = data.total.toString(),
+              } else {
+                console.log(data);
+
+                var number_string = data.total.toString(),
                   sisa = number_string.length % 3,
                   rupiah = number_string.substr(0, sisa),
                   ribuan = number_string.substr(sisa).match(/\d{3}/g);
 
-                if (ribuan){
+                if (ribuan) {
                   separator = sisa ? '.' : '';
                   rupiah += separator + ribuan.join('.');
                 }
@@ -402,6 +447,8 @@
           }
         });
       }
+
+
 
       // function barcodePajak(me) {
 

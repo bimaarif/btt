@@ -109,6 +109,18 @@ class bttModel extends CI_model
         return $tampil;
     }
 
+    public function cekFakturSupplier($no_faktur){
+        $sql = "SELECT no_faktur FROM tb_faktur WHERE no_faktur = '$no_faktur'";
+        $result = $this->db2->query($sql);
+        return $result->num_rows();
+    }
+
+    public function cekScanQrcode($faktur_pajak){
+        $sql = "SELECT fak_pjk FROM tb_faktur WHERE fak_pjk = '$faktur_pajak'";
+        $result = $this->db2->query($sql);
+        return $result->num_rows();
+    }
+
 
     public function insert_faktur($data, $table)
     {

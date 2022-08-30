@@ -141,17 +141,26 @@ class faktur extends CI_Controller
 
 		// cek validasi data duplikat pada nomor faktur supplier
 		// $sql = "";
-		$sqlCekFaktur = $this->db2->query("SELECT no_faktur, fak_pjk FROM tb_faktur WHERE no_faktur = '$no_faktur'");
+		$sqlCekFaktur  = $this->db2->query("SELECT * FROM tb_faktur WHERE no_faktur = '$no_faktur'");
+		// $sqlCekBarcode = $this->db2->query("SELECT fak_pjk FROM tb_faktur WHERE fak_pjk = '$faktur_pajak'");
 		$cek = $sqlCekFaktur->num_rows();
-		if ($cek > 0) {
+		// $cek2 = $sqlCekBarcode->num_rows();
+		if ($cek > 0){
 			$this->session->set_flashdata('message', '<div class="alert alert-warning alert-dismissible  fade show" role="alert">
-			<strong>nomor faktur supplier atau url sudah digunakan</strong>
+			<strong>nomor faktur supplier atau url barcode faktur pajak sudah pernah digunakan</strong>
 			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 			  <span aria-hidden="true">&times;</span>
 			</button>
 			</div>');
 			redirect('admin/faktur/index/' . $no_rcv);
-
+			// $data = [
+			// 	'status'  => 200,
+			// 	'error'   => false,
+			// 	'message' => "success get data",
+			// 	'results' => "<p class='text-danger'>no receiving sudah ada, silahkan ganti dengan yang lain</p>"
+			// ];
+			// echo json_encode($data);
+            
 		} else {
 			if ($csv = '') {
 			} else {
@@ -163,61 +172,95 @@ class faktur extends CI_Controller
 				} else {
 					$csv = $this->upload->data('file_name');
 
+
+
 					$pecahCsv = array_map('str_getcsv', file(base_url() . '/assets/csv/' . $csv));
 
-					echo "<pre>";
-					echo print_r($pecahCsv); die;
-					echo "</pre>";
-                     
-					foreach($pecahCsv as $key => $values){
-						$cekCount = count($values);
-
-						var_dump($values); die;
-
-						if($key > 0){
-                            if($cekCount == 12){
-								
-							}
-						}
-					}
-                    
-					// $pecahFile  = $pecahCsv[1][0];
-					// $pecahFile1 = $pecahCsv[1][1];
-					
-
-					$ccv = count($pecahCsv);
-					// $nama_brg = $pecahCsv[1][6];
-					// $qty = $pecahCsv[1][7];
-                    // $hrg = $pecahCsv[1][8];
-					// $disc = $pecahCsv[1][9];
-                    // $ppn = $pecahCsv[1][10];
-					// $total = $pecahCsv[1][11];
-
-					// $query = "INSERT INTO csv_detail (fak_supp, kode_supp, nama_brg, qty, harga, disc, ppn, total) values ($no_faktur, $kode_supplier, $nama_brg, $qty, $hrg, $disc, $ppn, $total)";
-
-					// $simpan = $this->db2->query($query);
-
-					// var_dump($query); die;
-                   
-
 					// echo "<pre>";
-
-					// print_r($nama_brg);
-					// echo "<br>";
-					// print_r($qty);
-					// echo "<br>";
-					// print_r($hrg);
-					// echo "<br>";
-					// print_r($disc);
-					// echo "<br>";
-					// print_r($ppn);
-					// echo "<br>";
-					// print_r($total);
+					// echo print_r($pecahCsv);
 					// die;
 					// echo "</pre>";
 
-					// $query = "INSERT INTO csv_detail (fak_supp, kode_supp, nama_brg, qty, harga, disc, ppn, date) values ()";
+					$cek = '';
+					$no = 1;
+					$total = 0;
+					$sum = 0;
+					$data = [];
 
+					foreach ($pecahCsv as $key => $values) {
+						// echo print_r(array_sum($values[11])); die;
+
+						$total += (int) $values[11];
+
+						
+						$cekCount = count($values);
+						// var_dump($cekCount);die;
+
+
+						if ($key > 0) {
+							if ($cekCount == 12) {
+								$data[]=[
+									'fak_supp'=> $no_faktur,
+									'kode_supp'=> $kode_supplier,
+									'nama_brg'=> $values[6],
+									'qty'=> $values[7],
+									'harga'=> $values[8],
+									'disc'=> $values[9],
+									'ppn'=> $values[10],
+									'total'=> $values[11]
+								];
+
+
+								// $detailCsv = "REPLACE INTO csv_detail (fak_supp, kode_supp, nama_brg, qty, harga, disc, ppn) values('$no_faktur','$kode_supplier','$values[6]','$values[7]','$values[8]','$values[9]','$values[10]')";
+
+								// $result = $this->db2->query($detailCsv);
+
+								// var_dump($result);
+
+								// echo "<pre>";
+								// echo print_r($result);
+								// echo "</pre>";
+								// die;
+								// $cek = $no++;
+
+								// die
+							}
+						}
+					}
+
+
+					if($total == $tagihan ){
+						foreach($data as $dt){
+							// print_r($dt); die;
+							$this->db2->insert('csv_detail', $dt);
+						}
+
+					}else{
+						// print_r('selisih');
+						$this->session->set_flashdata('message', '<div class="alert alert-warning alert-dismissible  fade show" role="alert">
+						<strong>file csv anda tidak sesuai dengan total tagihan faktur pajak</strong>
+						<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						  <span aria-hidden="true">&times;</span>
+						</button>
+						</div>');
+						redirect('admin/faktur/index/' . $no_rcv);
+					}
+
+					// print_r($data);
+					// print_r($total);
+					// die;
+
+					// $pecahFile  = $pecahCsv[1][0];
+					// $pecahFile1 = $pecahCsv[1][1];
+
+
+					// $ccv = count($pecahCsv);
+					// $nama_brg = $pecahCsv[1][6];
+					// $qty = $pecahCsv[1][7];
+					// $hrg = $pecahCsv[1][8];
+					// $disc = $pecahCsv[1][9];
+					// $ppn = $pecahCsv[1][10];
+					// $total = $pecahCsv[1][11];
 
 				}
 			}
@@ -246,8 +289,6 @@ class faktur extends CI_Controller
 
 
 
-		// }
-
 	}
 
 
@@ -272,43 +313,38 @@ class faktur extends CI_Controller
 
 
 
-	public function validateFaktur()
+	public function validateFakturSupplier()
 	{
-		try {
+		
 			$no_faktur    = $this->input->post('no_faktur');
-			$faktur_pajak = $this->input->post('fak_pjk');
+			
 
+			$cekFakturSupplier = $this->bttModel->cekFakturSupplier($no_faktur);
+			
 
-			$resultLocal = $this->bttModel->getByNoFaktur($no_faktur, $faktur_pajak);
-
-			if ($resultLocal > 0) {
+			if ($cekFakturSupplier > 0) {
 				$data = [
 					'status'  => 200,
 					'error'   => false,
 					'message' => "success get data",
-					'results' => "<p class='text-danger'>no sudah ada, silahkan ganti dengan yang lain</p>"
+					'results' => "<p class='text-danger'>no. faktur supplier sudah ada, silahkan ganti dengan yang lain</p>"
 				];
 				echo json_encode($data);
-			} else {
-				$data = [
-					'status'  => 404,
-					'error'   => false,
-					'message' => "Data Not Found"
-				];
-				echo json_encode($data);
-			}
-		} catch (Exception $e) {
+			} 
+	}
+
+	public function validateScanQrcode()
+	{
+		$faktur_pajak = $this->input->post('fak_pjk');
+		
+		$cekScanQrcode = $this->bttModel->cekScanQrcode($faktur_pajak);
+
+		if($cekScanQrcode > 0){
 			$data = [
-				'status'  => 6500,
-				'error'   => true,
-				'message' => $e
-			];
-			echo json_encode($data);
-		} catch (Throwable $th) {
-			$data = [
-				'status'  => 500,
-				'error'   => true,
-				'message' => $th
+				'status'  => 200,
+				'error'   => false,
+				'message' => "success get data",
+				'results' => "<p class='text-danger'>Qrcode sudah digunakan, silahkan scan kembali</p>"
 			];
 			echo json_encode($data);
 		}
@@ -330,8 +366,6 @@ class faktur extends CI_Controller
 	public function checkqrcode()
 	{
 		$url = $this->input->post('link');
-
-
 
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_URL, $url);

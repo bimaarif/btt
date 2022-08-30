@@ -88,7 +88,7 @@
                         } else if ($btt->status == "Unconfirm") {
                         ?>
                           <a href='<?php echo base_url() . 'admin/receiving/index/' . $btt->no_btt ?>' class='btn btn-primary'>Input Receiving</a>
-                          <button  class='btn btn-success' onclick="gotoPrint('<?php echo $btt->no_btt; ?>','Unconfirm', this)">Print</button>
+                          <button  class='btn btn-success' onclick="gotoPrint('<?php echo $btt->no_btt; ?>','Unconfirm', this)">Ajukan</button>
                           <!-- <button class='btn btn-success' data-toggle="modal" data-target="#print">Print</button> -->
                           <!-- <button class="btn btn-success" data-toggle="modal" onclick='sampleButton();'>Print</button> -->
                         <?php
