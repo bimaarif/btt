@@ -115,8 +115,8 @@ class bttModel extends CI_model
         return $result->num_rows();
     }
 
-    public function cekScanQrcode($faktur_pajak){
-        $sql = "SELECT fak_pjk FROM tb_faktur WHERE fak_pjk = '$faktur_pajak'";
+    public function cekScanQrcode($no_faktur_pajak){
+        $sql = "SELECT no_fak_pjk FROM tb_faktur WHERE no_fak_pjk = '$no_faktur_pajak";
         $result = $this->db2->query($sql);
         return $result->num_rows();
     }
@@ -215,6 +215,12 @@ class bttModel extends CI_model
         return $result;
     }
 
+    public function edit_faktur($table,$data,$where){
+        $result = $this->db2->update($table,$data,$where);
+
+        return $result;
+    }
+
     public function cekFaktur($no_rcv)
     {
         $query = "SELECT tb_rcv.no_btt,  tb_rcv.no_rcv, tb_faktur.no_faktur,  tb_faktur.fak_pjk, tb_faktur.tagihan, tb_faktur.csv 
@@ -236,6 +242,17 @@ class bttModel extends CI_model
         $result = $this->db2->query($query);
 
         return $result;
+    }
+
+    public function update_rcv($table,$data,$where){
+        $result = $this->db2->update($table,$data,$where);
+
+        return $result;
+    }
+
+    public function hapus_rcv($id_rcv, $no_btt){
+        $delete = $this->db2->delete('tb_rcv', ['id_rcv' => $id_rcv, 'no_btt' => $no_btt]);
+        return $delete;
     }
 
     public function updateConfirm($no_btt, $status)

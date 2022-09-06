@@ -88,9 +88,9 @@
     </div> -->
 
       <div class="float-left">
-        <button type="button" onclick="addFormBtt()" class="btn btn-primary btn-sm mb-3" data-toggle="modal" data-target="#tambahFaktur"><i class="fa-thin fa-plus"></i>tambah faktur</button>
+        <button type="button" onclick="handleUpdateOrAddFaktur(false, 'add')" class="btn btn-primary btn-sm mb-3"><i class="fa-thin fa-plus"></i>tambah faktur</button>
         <!-- <a href="javascript:window.history.go(-1)" type="button" class="btn btn-primary btn-sm mb-3">kembali</a> -->
-        <!-- <?php var_dump($no_bttt); ?> -->
+
         <a href="<?php echo base_url() . 'admin/receiving/index/' . $no_bttt . '/' . $no_rcv; ?>" type="button" class="btn btn-primary btn-sm mb-3">kembali</a>
       </div>
 
@@ -137,6 +137,7 @@
                       <td><?php echo $f->csv; ?></td>
                       <td>
                         <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/faktur/hapus_faktur/<?= $f->id_faktur . '/' . $no_rcv ?>" class="btn btn-danger">hapus</a>
+                        <a href="#" onclick="handleUpdateOrAddFaktur(this,'update')" data-id_faktur="<?php echo $f->id_faktur ?>" data-no_faktur="<?php echo $f->no_faktur ?>" data-fak_pjk="<?php echo $f->fak_pjk ?>" data-no_fak_pjk="<?php echo $f->no_fak_pjk ?>" data-tagihan="<?php echo $f->tagihan ?>" data-csv="<?php echo $f->csv ?>" class="btn btn-success ubahFak">Ubah</a>
                       </td>
                     </tr>
                   <?php endforeach; ?>
@@ -157,10 +158,11 @@
 
       </div>
     </div>
+  </div>
 
-    <!-- Modal -->
+  <!-- Modal -->
 
-    <!-- <div class="modal fade" id="bttModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="bttModalLabel" aria-hidden="true">
+  <!-- <div class="modal fade" id="bttModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="bttModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-md modal-dialog-centered ">
       <div class="modal-content">
 
@@ -174,7 +176,7 @@
     </div>
   </div> -->
 
-    <!-- <div class="modal fade" id="exampleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <!-- <div class="modal fade" id="exampleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered ">
       <div class="modal-content">
 
@@ -191,298 +193,383 @@
       </div>
     </div>
   </div> -->
-
-    <!-- form tambah faktur -->
-    <div class="modal fade" id="tambahFaktur" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
+  <!-- form tambah faktur -->
+  <div class="modal fade" id="tambahFaktur" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="<?php echo base_url('admin/faktur/simpan_faktur'); ?>" method="POST" enctype="multipart/form-data">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Tambah faktur</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
+            <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form action="<?php echo base_url('admin/faktur/simpan_faktur'); ?>" method="POST" enctype="multipart/form-data">
-              <input type="text" value="<?php echo $no_rcv ?>" class="form-control" name="no_rcv" hidden>
-              <div class="form-group">
-                <label for="no_faktur">No. Faktur Supplier</label>
-                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Input Nomor Faktur Supplier" name="no_faktur" id="no_faktur" onChange='checkNoFakturSupplier(value)' autofocus required>
-                <span id="no_fak_supp-availability-status" class="text-danger"></span>
+            <input type="text" value="<?php echo $no_rcv ?>" class="form-control" name="no_rcv" hidden>
+
+            <div class="form-group">
+              <label for="no_faktur">No. Faktur Supplier</label>
+              <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Input Nomor Faktur Supplier" name="no_faktur" id="no_faktur" onChange='checkNoFakturSupplier(value)' autofocus required>
+              <span id="no_fak_supp-availability-status" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+              <label>Qrcode Faktur Pajak</label>
+              <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Scan Qrcode Faktur Pajak" name="fak_pjk" id="qrcode1" onChange='barcodePajak(this)' autofocus required>
+              <span id="scan-Qrcode-availability-status" class="text-danger"></span>
+              <div id="validationServerUsernameFeedback" class="invalid-feedback">
               </div>
 
               <div class="form-group">
-                <label>Qrcode Faktur Pajak</label>
-                <input type="text" class="form-control fak_pjk" aria-describedby="emailHelp" placeholder="Scan Qrcode Faktur Pajak" name="fak_pjk" id="qrcode1" onChange='barcodePajak(this)' autofocus required>
-                <span id="scan-Qrcode-availability-status" class="text-danger"></span>
-                <div id="validationServerUsernameFeedback" class="invalid-feedback">
-                </div>
+                <label>No. Faktur Pajak</label>
+                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="" name="no_fak_pjk" id="no_fak_pjk" onChange="checkNoFakturPajak(value)" readonly required>
+                <span id="no_faktur-availability-status" class="text-danger"></span>
+              </div>
 
-                <div class="form-group">
-                  <label>No. Faktur Pajak</label>
-                  <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="" name="no_fak_pjk" id="no_fak_pjk" readonly required>
-                  <span id="no_faktur-availability-status" class="text-danger"></span>
-                </div>
+              <div class="form-group">
+                <label>Total Harga Faktur Pajak</label>
+                <input type="text" onKeyup="formatRupiah(this)" class="form-control" placeholder="" name="tagihan" id="tagihan" readonly required>
 
-                <div class="form-group">
-                  <label>Total Harga Faktur Pajak</label>
-                  <input type="text" onKeyup="formatRupiah(this)" class="form-control" placeholder="" name="tagihan" id="tagihan" readonly required>
+              </div>
 
-                </div>
+              <div class="form-group">
+                <label>Upload CSV</label>
+                <input type="file" id="csv" onchange="checkfile(this);" class="form-control" placeholder="csv" name="csv" accept=".csv" required>
+                <span class="text-danger">(hanya bisa upload file csv)</span>
+              </div>
 
-                <div class="form-group">
-                  <label>Upload CSV</label>
-                  <input type="file" id="file" onchange="checkfile(this);" class="form-control" placeholder="csv" name="csv" id="csv" accept=".csv" required>
-                  <span class="text-danger">(hanya bisa upload file csv)</span>
-                </div>
-
-                <button type="submit" class="btn btn-primary" id="simpanFaktur">simpan</button>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">batal</button>
-          </div>
-        </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+              <button type="submit" class="btn btn-primary" id="simpanFaktur">simpan</button>
+            </div>
+        </form>
       </div>
     </div>
-    <!-- end -->
-
-    <div class="modal fade" id="alertModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-sm modal-dialog-centered ">
-        <div class="modal-content">
-
-          <div class="modal-body text-center">
-            <h4 class="">Hapus tagihan ini?</h4>
-            <button type="button" class="btn btn-secondary" style="width: 100px;" data-bs-dismiss="modal">Tidak</button>
-            <button onclick="setAccept()" type="button" class="btn btn-primary ml-3" style="width: 100px;">Ya</button>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- Optional JavaScript; choose one of the two! -->
-
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-    <script src="{{asset('js/jquery.datetimepicker.full.min.js')}}"></script>
-
-    <script>
-      $(document).ready(function() {
-        if (($.trim($("tbody").html()) == "")) {
-          $("#selesai").hide();
-        } else {
-          $("#selesai").show();
-        }
-
-        $('#qrcode1').keyup(function() {
-          let faktur_pajak = $('#qrcode1').val();
-          if (faktur_pajak == 0) {
-            $('#scan-Qrcode-availability-status').text('');
-          } else {
-            $.ajax({
-              url: '<?php echo base_url('admin/faktur/validateScanQrcode'); ?>',
-              type: 'POST',
-              data: {
-                fak_pjk: faktur_pajak
-              },
-              success: function(hasil) {
-                const obj = JSON.parse(hasil);
-                if (obj.status == 200 && obj.message == 'success get data') {
-                  $('#scan-Qrcode-availability-status').html(obj.results);
-                }
-              }
-            });
-          }
-        });
-
-      });
+  </div>
+  <!-- end -->
 
 
-      function checkfile(sender) {
-        var validExts = new Array(".csv");
-        var fileExt = sender.value;
-        fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
-        if (validExts.indexOf(fileExt) < 0) {
-          alert("maaf hanya boleh upload file" +
-            validExts.toString());
-          return false;
-        } else return true;
+  <!-- form ubah faktur -->
+
+  <!-- end -->
+
+  <!-- Optional JavaScript; choose one of the two! -->
+
+  <!-- Option 1: Bootstrap Bundle with Popper -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script src="{{asset('js/jquery.datetimepicker.full.min.js')}}"></script>
+  <script src="<?php echo base_url(); ?>assets/vendor/jquery/jquery.min.js"></script>
+
+
+  <script>
+    function handleUpdateOrAddFaktur(me, action) {
+      if (action == 'add') {
+        $('#id_faktur').val('');
+        $('#no_faktur').val('');
+        $('#fak_pjk').val('');
+        $('#no_fak_pjk').val('');
+        $('#tagihan').val('');
+        $('#tambahFaktur .modal-title').text('Tambah Faktur')
+        $('#tambahFaktur form').attr('action', "<?php echo base_url('admin/faktur/simpan_faktur'); ?>")
+        $('#tambahFaktur').modal('show');
+        return
       }
 
+      if (action == 'update') {
 
-      $(document).on('keyup', '#no_faktur', function() {
-        $('#no_fak_supp-availability-status').html('');
-      });
+        const id_faktur = $(me).data('id_faktur');
+        const no_faktur = $(me).data('no_faktur');
+        const fak_pjk = $(me).data('fak_pjk');
+        const no_fak_pjk = $(me).data('no_fak_pjk');
+        const tagihan = $(me).data('tagihan');
+        // const csv = $(me).data('csv');
 
-      function checkNoFakturSupplier(value) {
+        var number_string = tagihan.toString(),
+          sisa = number_string.length % 3,
+          rupiah = number_string.substr(0, sisa),
+          ribuan = number_string.substr(sisa).match(/\d{3}/g);
 
+        if (ribuan) {
+          separator = sisa ? '.' : '';
+          rupiah += separator + ribuan.join('.');
+        }
+
+        $('#id_faktur').val(id_faktur);
+        $('#no_faktur').val(no_faktur);
+        $('#qrcode1').val(fak_pjk);
+        $('#no_fak_pjk').val(no_fak_pjk);
+        $('#tagihan').val('Rp. ' + rupiah);
+        // $('#file').val(csv);
+
+        $('#tambahFaktur .modal-title').text('Ubah Faktur')
+        $('#tambahFaktur form').attr('action', "<?php echo base_url('admin/faktur/edit_Faktur'); ?>")
+        $('#tambahFaktur').modal('show');
+        return
+      }
+
+    }
+
+
+
+    // $(document).ready(function() {
+    if (($.trim($("tbody").html()) == "")) {
+      $("#selesai").hide();
+    } else {
+      $("#selesai").show();
+    }
+
+    $('#qrcode1').keyup(function() {
+      let faktur_pajak = $('#qrcode1').val();
+      if (faktur_pajak == 0) {
+        $('#scan-Qrcode-availability-status').text('');
+      } else {
         $.ajax({
-          type: "POST",
-          url: "<?php echo base_url('admin/faktur/validateFakturSupplier'); ?>",
+          url: '<?php echo base_url('admin/faktur/validateScanQrcode'); ?>',
+          type: 'POST',
           data: {
-            no_faktur: value
+            fak_pjk: faktur_pajak
           },
-          success: function(res) {
-            // console.log(res);
-            const obj = JSON.parse(res);
+          success: function(hasil) {
+            const obj = JSON.parse(hasil);
             if (obj.status == 200 && obj.message == 'success get data') {
-              $("#no_fak_supp-availability-status").html(obj.results);
-              $("#no_faktur").val('');
-            }
-
-          }
-        });
-      }
-    </script>
-
-    <script>
-      let no = 1;
-      let limit = 11;
-      let temp = '';
-
-      $(document).ready(function() {
-        addRow();
-
-        $('#form_faktur').submit(function() {
-          let no_faktur = $('#no_faktur').val();
-          let fak_pjk = $('#fak_pjk').val();
-          let tagihan = $('#tagihan').val();
-          let csv = $('#csv').val();
-
-          if (no_faktur == "") {
-            swal("no faktur harus di isi", "warning");
-            return false;
-          } else if (fak_pjk == "") {
-            swal("faktur pajak harus di isi", "warning");
-            return false;
-          } else if (tagihan == "") {
-            swal("tagihan harus di isi", "warning");
-            return false;
-          } else if (csv == "") {
-            swal("csv harus di upload", "warning");
-            return false;
-          } else {
-            return true;
-          }
-
-        });
-
-      });
-
-
-      $(document).on('keyup', '.no_faktur', function() {
-        $('#scan-Qrcode-availability-status').html('');
-      });
-
-
-      function barcodePajak(me) {
-        let link = me.value;
-
-
-        $.ajax({
-          method: 'POST',
-          url: "<?php echo base_url('admin/faktur/checkqrcode') ?>",
-          data: {
-            // me.value
-            link: link
-          },
-          success: function(res) {
-            let data = JSON.parse(res);
-
-            $.ajax({
-              type: "POST",
-              url: "<?php echo base_url('admin/faktur/validateScanQrcode'); ?>",
-              data: {
-                no_faktur: data
-              },
-              success: function(res) {
-                // console.log(res);
-                const obj = JSON.parse(res);
-                if (obj.status == 200 && obj.message == 'success get data') {
-                  $("#no_fak_supp-availability-status").html(obj.results);
-                  $("#no_faktur").val('');
-                }
-
-              }
-            });
-
-            if (data == true) {
-              Swal.fire({
-                position: 'top-end',
-                icon: 'error',
-                title: 'maaf koneksi ke server terputus, coba ulangi lagi',
-                showConfirmButton: false,
-                timer: 3000
-              });
-              $('#qrcode1').val('').focus();
-            } else if (data == "No service was found.0") {
-              // show modal alert
-              console.log(res);
-              alert('');
-            } else {
-              //  send to id no faktur and total faktur
-              // let data = JSON.parse(res);
-              if (data == true) {
-
-              } else {
-                console.log(data);
-
-                var number_string = data.total.toString(),
-                  sisa = number_string.length % 3,
-                  rupiah = number_string.substr(0, sisa),
-                  ribuan = number_string.substr(sisa).match(/\d{3}/g);
-
-                if (ribuan) {
-                  separator = sisa ? '.' : '';
-                  rupiah += separator + ribuan.join('.');
-                }
-                // console.log(data.no_faktur);
-                $('#no_fak_pjk').val(`010` + `${'.'}` + data.no_faktur);
-                $('#tagihan').val(`Rp. ` + rupiah);
-              }
-
+              $('#scan-Qrcode-availability-status').html(obj.results);
             }
           }
         });
       }
+    });
 
 
-
-      // function barcodePajak(me) {
-
-      //   $.ajax({
-      //     method: 'post',
-      //     url: "{{url('chekqrcode')}}",
-      //     data: {
-      //       _token: "{{ csrf_token() }}",
-      //       url: me.value
-      //     },
-      //     success: function(res) {
-      //       let tagihan = $(me).parent().parent().find('input[name=jumlah_tagihan]').val(res)
-
-      //       formatRupiah(tagihan[0])
-      //     }
-      //   })
-
-      // }
+    // });
 
 
-      function addRow(me = false) {
+    function checkfile(sender) {
+      var validExts = new Array(".csv");
+      var fileExt = sender.value;
+      fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+      if (validExts.indexOf(fileExt) < 0) {
+        alert("maaf hanya boleh upload file" +
+          validExts.toString());
+        return false;
+      } else return true;
+    }
 
-        // if(no >= limit){
-        //   return true;
-        // }
-        // let forms = $('#allform').children().last().find('input[name=no_rcv_suzuya]').val();
 
-        if ($('#allform').children().length == 10) {
-          return;
+    $(document).on('keyup', '#no_faktur', function() {
+      $('#no_fak_supp-availability-status').html('');
+    });
+
+    function checkNoFakturSupplier(value) {
+
+      $.ajax({
+        type: "POST",
+        url: "<?php echo base_url('admin/faktur/validateFakturSupplier'); ?>",
+        data: {
+          no_faktur: value
+        },
+        success: function(res) {
+          // console.log(res);
+          const obj = JSON.parse(res);
+          if (obj.status == 200 && obj.message == 'success get data') {
+            $("#no_fak_supp-availability-status").html(obj.results);
+            $("#no_faktur").val('');
+          }
+
         }
+      });
+    }
 
-        $(me).addClass('d-none');
+    $(document).on('keyup', '#no_fak_pjk', function() {
+      $('#no_faktur-availability-status').html('');
+    });
 
-        let row = `<div id="row${no}">
+    function checkNoFakturPajak(value) {
+
+      $.ajax({
+        type: "POST",
+        url: "<?php echo base_url('admin/faktur/validateNofakturPajak'); ?>",
+        data: {
+          no_fak_pjk: value
+        },
+        success: function(res) {
+          // console.log(res);
+          const obj = JSON.parse(res);
+          if (obj.status == 200 && obj.message == 'success get data') {
+            $("#no_faktur-availability-status").html(obj.results);
+            $("#no_fak_pjk").val('');
+          }
+
+        }
+      });
+    }
+
+    let no = 1;
+    let limit = 11;
+    let temp = '';
+
+    // $(document).ready(function() {
+    addRow();
+
+    $('#form_faktur').submit(function() {
+      let no_faktur = $('#no_faktur').val();
+      let fak_pjk = $('#fak_pjk').val();
+      let tagihan = $('#tagihan').val();
+      let csv = $('#csv').val();
+
+      if (no_faktur == "") {
+        swal("no faktur harus di isi", "warning");
+        return false;
+      } else if (fak_pjk == "") {
+        swal("faktur pajak harus di isi", "warning");
+        return false;
+      } else if (tagihan == "") {
+        swal("tagihan harus di isi", "warning");
+        return false;
+      } else if (csv == "") {
+        swal("csv harus di upload", "warning");
+        return false;
+      } else {
+        return true;
+      }
+
+    });
+
+    // });
+
+
+    $(document).on('keyup', '.no_faktur', function() {
+      $('#scan-Qrcode-availability-status').html('');
+    });
+
+
+    function barcodePajak(me) {
+      let link = me.value;
+
+      $.ajax({
+        method: 'POST',
+        url: "<?php echo base_url('admin/faktur/checkqrcode') ?>",
+        data: {
+          // me.value
+          link: link
+        },
+        success: function(res) {
+          let data = JSON.parse(res);
+
+          // console.log(data);
+
+          // if(data == "berhasil"){
+          //   let number_string = data.total.toString(),
+          //       sisa = number_string.length % 3,
+          //       rupiah = number_string.substr(0, sisa),
+          //       ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+          //     if (ribuan) {
+          //       separator = sisa ? '.' : '';
+          //       rupiah += separator + ribuan.join('.');
+          //     }
+          //     // console.log(data.no_faktur);
+          //     // $('#no_fak_pjk').val(`010` + `${'.'}` + data.no_faktur);
+          //     $('#no_fak_pjk').val(`010` + `${'.'}` + data.no_faktur);
+          //     $('#tagihan').val(`Rp. ` + rupiah);
+          // }else if(data == "gagal"){
+          //     alert("URL tidak benar");
+          //     $('#qrcode1').val('');
+          //     $('#no_fak_pjk').val('');
+          //     $('#tagihan').val('');
+          // }else if(data == "ada"){
+          //     alert("faktur pajak sudah digunakan");
+          //     $('#qrcode1').val('');
+          //     $('#no_fak_pjk').val('');
+          //     $('#tagihan').val('');
+          // }else{
+          //     Swal.fire({
+          //        position: 'top-end',
+          //        icon: 'error',
+          //        title: 'maaf koneksi ke server terputus, coba scan ulang lagi',
+          //        showConfirmButton: false,
+          //        timer: 3000
+          //     });
+          //     $('#qrcode1').val('');
+          //     $('#no_fak_pjk').val('');
+          //     $('#tagihan').val('');
+          // }
+
+          if (data == true) {
+            Swal.fire({
+              position: 'top-end',
+              icon: 'error',
+              title: 'maaf koneksi ke server terputus, coba scan ulang lagi',
+              showConfirmButton: false,
+              timer: 3000
+            });
+            $('#qrcode1').val('').focus();
+          } else if (data.total == "ada") {
+            // show modal alert
+            // console.log(res);
+            alert('total harga sudah ada');
+          } else {
+            //  send to id no faktur and total faktur
+            // let data = JSON.parse(res);
+            if (data == true) {
+
+            } else {
+              console.log(data);
+
+              var number_string = data.total.toString(),
+                sisa = number_string.length % 3,
+                rupiah = number_string.substr(0, sisa),
+                ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+              if (ribuan) {
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+              }
+              // console.log(data.no_faktur);
+              // $('#no_fak_pjk').val(`010` + `${'.'}` + data.no_faktur);
+              $('#no_fak_pjk').val(`010` + `${'.'}` + data.no_faktur);
+              $('#tagihan').val(`Rp. ` + rupiah);
+            }
+
+          }
+        }
+      });
+    }
+
+
+
+    // function barcodePajak(me) {
+
+    //   $.ajax({
+    //     method: 'post',
+    //     url: "{{url('chekqrcode')}}",
+    //     data: {
+    //       _token: "{{ csrf_token() }}",
+    //       url: me.value
+    //     },
+    //     success: function(res) {
+    //       let tagihan = $(me).parent().parent().find('input[name=jumlah_tagihan]').val(res)
+
+    //       formatRupiah(tagihan[0])
+    //     }
+    //   })
+
+    // }
+
+
+    function addRow(me = false) {
+
+      // if(no >= limit){
+      //   return true;
+      // }
+      // let forms = $('#allform').children().last().find('input[name=no_rcv_suzuya]').val();
+
+      if ($('#allform').children().length == 10) {
+        return;
+      }
+
+      $(me).addClass('d-none');
+
+      let row = `<div id="row${no}">
     <form>
         <div class="row w-100">
           <div class="col-2 mb-3">
@@ -513,72 +600,72 @@
 `;
 
 
-        $('#allform').append(row);
-        no++;
+      $('#allform').append(row);
+      no++;
 
 
-      }
+    }
 
 
-      function removeRow(me) {
-        temp = $(me).parent().parent().parent().parent()[0].id
-        $('#alertModal').modal('show');
+    function removeRow(me) {
+      temp = $(me).parent().parent().parent().parent()[0].id
+      $('#alertModal').modal('show');
 
-      }
+    }
 
-      function setAccept() {
-        $(`#${temp}`).remove();
-        console.log($('#allform').children().last().find('#btnAdd').removeClass('d-none'))
-        $('#alertModal').modal('hide');
-      }
+    function setAccept() {
+      $(`#${temp}`).remove();
+      console.log($('#allform').children().last().find('#btnAdd').removeClass('d-none'))
+      $('#alertModal').modal('hide');
+    }
 
-      // function simpan() {
+    // function simpan() {
 
-      //   let form = $('#allform').children().toArray()
-      //   let dataForm = []
-      //   let error = ''
-
-
-
-      //   form.map(e => {
-      //     $(e).find('input').toArray().map(i => {
-      //       if (!i.value) {
-      //         error += i.name + ', '
-      //       }
-      //     })
-      //     dataForm.push($(e).children().serializeArray())
-      //   })
-
-      //   // if(error){
-      //   //   alert('error  :'+error +'. input tidak benar!')
-      //   // }else{
+    //   let form = $('#allform').children().toArray()
+    //   let dataForm = []
+    //   let error = ''
 
 
-      //   $.ajax({
-      //     type: 'POST',
-      //     url: "<?php echo base_url() ?>admin/Dashboard/insert_data",
-      //     data: {
-      //       dataForm
-      //     },
-      //     success: function(res) {
-      //       console.log(res = "success");
-      //       // res = JSON.parse(res)
 
-      //       if ("success") {
-      //         // $('#allform').html(respond);
-      //         // alert('data berhasil di inputkan');
-      //         window.location.reload();
+    //   form.map(e => {
+    //     $(e).find('input').toArray().map(i => {
+    //       if (!i.value) {
+    //         error += i.name + ', '
+    //       }
+    //     })
+    //     dataForm.push($(e).children().serializeArray())
+    //   })
 
-      //       }
-      //     },
-      //     error: function(error) {
-      //       alert('Terjadi kesalahan: periksa inputan anda!');
-      //     }
-      //   })
+    //   // if(error){
+    //   //   alert('error  :'+error +'. input tidak benar!')
+    //   // }else{
 
 
-      // }
-    </script>
+    //   $.ajax({
+    //     type: 'POST',
+    //     url: "<?php echo base_url() ?>admin/Dashboard/insert_data",
+    //     data: {
+    //       dataForm
+    //     },
+    //     success: function(res) {
+    //       console.log(res = "success");
+    //       // res = JSON.parse(res)
+
+    //       if ("success") {
+    //         // $('#allform').html(respond);
+    //         // alert('data berhasil di inputkan');
+    //         window.location.reload();
+
+    //       }
+    //     },
+    //     error: function(error) {
+    //       alert('Terjadi kesalahan: periksa inputan anda!');
+    //     }
+    //   })
+
+
+    // }
+  </script>
 </body>
 
 </html>

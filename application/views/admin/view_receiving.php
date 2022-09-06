@@ -81,6 +81,7 @@
           <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary"></h6>
             <h5>No. BTT : <?php echo $no_btt; ?> </h5>
+            <?php echo $this->session->flashdata('message') ?>
           </div>
           <div class="card-body">
             <div class="table-responsive">
@@ -95,26 +96,29 @@
                   </tr>
                 </thead>
                 <tbody>
-             
-                  <?php 
+
+                  <?php
                   $no = 1;
                   foreach ($receiving as $rcv) : ?>
                     <tr>
                       <td><?php echo $no++; ?></td>
                       <td><?php echo $rcv->no_rcv; ?></td>
                       <td>
-                       <div class="row"> 
-                         <div class="col">
-                             <div style="text-align:left">Rp.</div>
-                         </div>
-                         <div class="col">
-                             <div style="text-align:right"><?php echo number_format($rcv->jml_tgh); ?></div>
-                         </div>
-                        </div> 
+                        <div class="row">
+                          <div class="col">
+                            <div style="text-align:left">Rp.</div>
+                          </div>
+                          <div class="col">
+                            <div style="text-align:right"><?php echo number_format($rcv->jml_tgh); ?></div>
+                          </div>
+                        </div>
                       </td>
-                      <td><?php echo date("d-m-y",strtotime($rcv->tgl_rcv));  ?></td>
+                      <td><?php echo date("d-m-y", strtotime($rcv->tgl_rcv));  ?></td>
                       <td>
-                        <a href="<?php echo base_url().'admin/faktur/index/'.$rcv->no_rcv; ?>" type="button" class="btn btn-primary">input faktur</a>
+                        <a href="<?php echo base_url() . 'admin/faktur/index/' . $rcv->no_rcv; ?>" type="button" class="btn btn-primary">input faktur</a>
+                        <a href="" data-id_rcv="<?php echo $rcv->id_rcv ?>" data-no_rcv="<?php echo $rcv->no_rcv ?>" data-jml_tgh="<?php echo $rcv->jml_tgh ?>" data-tgl_rcv="<?php echo $rcv->tgl_rcv ?>" class="btn btn-success ubah" data-toggle="modal">Ubah</a>
+
+                        <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/receiving/hapus_rcv/<?= $rcv->id_rcv . '/' . $no_btt ?>" class="btn btn-danger">hapus</a>
                       </td>
                     </tr>
                   <?php endforeach; ?>
@@ -170,7 +174,7 @@
     </div>
   </div> -->
 
-    <!-- form tambah faktur -->
+    <!-- form tambah receiving -->
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -207,6 +211,72 @@
     </div>
     <!-- end -->
 
+    <!-- form edit receiving -->
+    <div class="modal fade" id="modalEditRcv" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Ubah recieving</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form action="<?php echo base_url('admin/receiving/edit_Rcv'); ?>" method="POST">
+              <input type="text" value="<?php echo $no_btt; ?>" name="no_btt" hidden>
+              <input type="text" name="id_rcv" value="<?php echo $rcv->id_rcv; ?>" class="id_rcv" hidden>
+              <div class="form-group">
+                <label for="exampleInputEmail1">No. receiving</label>
+                <input type="text" class="form-control no_rcv" aria-describedby="emailHelp" placeholder="Masukkan Nomor Receiving" name="no_rcv" id="no_rcv" onChange='checkNoRcvUpdate(value)' required>
+                <span class="no_rcv-availability-status text-danger"></span>
+              </div>
+              <div class="form-group">
+                <label for="tagihan">Total Nilai Receiving</label>
+                <input type="text" class="form-control jml_tgh" onKeyup="formatRupiah(this)" placeholder="total receiving" name="jml_tgh" id="jml_tgh" readonly required>
+              </div>
+              <div class="form-group">
+                <label>Tanggal Receiving</label>
+                <input type="date" class="form-control tgl_rcv" placeholder="masukkan tanggal receiving" name="tgl_rcv" id="tgl_rcv" readonly required>
+              </div>
+
+              <button type="submit" class="btn btn-primary">Ubah</button>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">batal</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end -->
+
+    <!-- Modal Delete Product-->
+    <form action="<?php echo base_url('admin/receiving/hapus_receiving'); ?>" method="post">
+      <div class="modal fade" id="delete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel"></h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+
+              <h4>Yakin ingin melakukan hapus receiving ?</h4>
+
+            </div>
+            <div class="modal-footer">
+              <input type="hidden" name="id_rcv" class="id_rcv">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+              <button type="submit" class="btn btn-primary">Yes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <!-- End Modal Delete Product-->
+
     <div class="modal fade" id="alertModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-sm modal-dialog-centered ">
         <div class="modal-content">
@@ -227,27 +297,82 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="{{asset('js/jquery.datetimepicker.full.min.js')}}"></script>
-
     <script>
-    
+      $(document).ready(function() {
 
-      $(document).on('keyup','#no_rcv',function() {
-          $('#no_rcv-availability-status').html('');   
+        $(".ubah").on('click', function() {
+          //get data dari button edit
+          const id_rcv = $(this).data('id_rcv');
+          const no_rcv = $(this).data('no_rcv');
+          const jml_tgh = $(this).data('jml_tgh');
+          const tgl_rcv = $(this).data('tgl_rcv');
+
+          var number_string = jml_tgh.toString(),
+            sisa = number_string.length % 3,
+            rupiah = number_string.substr(0, sisa),
+            ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+          if (ribuan) {
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+          }
+          // Set data to Form Edit
+          $('.id_rcv').val(id_rcv);
+          $('.no_rcv').val(no_rcv);
+          $('.jml_tgh').val('Rp. ' + rupiah);
+          $('.tgl_rcv').val(tgl_rcv);
+          // Call Modal Edit
+          $('#modalEditRcv').modal('show');
+        });
+
+        // $(".hapus").on('click', function(){
+        //    //  get data from button edit
+        //    const id_rcv = $(this).data('id_rcv');
+        //    //  set data to form edit
+        //    $('.id_rcv').val(id_rcv);
+        //    $('#delete').modal('show');
+        // });
+
+
+      });
+
+      function formatRupiah(angka, prefix) {
+        var number_string = angka.replace(/[^,\d]/g, '').toString(),
+          split = number_string.split(','),
+          sisa = split[0].length % 3,
+          rupiah = split[0].substr(0, sisa),
+          ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        // tambahkan titik jika yang di input sudah menjadi angka ribuan
+        if (ribuan) {
+          separator = sisa ? '.' : '';
+          rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+      }
+    </script>
+    <script>
+      $(document).on('keyup', '#no_rcv', function() {
+        $('#no_rcv-availability-status').html('');
+      });
+
+      $(document).on('keyup', '.no_rcv', function() {
+        $('.no_rcv-availability-status').html('');
+        // $('.jml_tgh').val('');
+        // $('.tgl_rcv').val('');
       });
 
       // new AutoNumeric('#jml_tgh',{
       //    decimalPlace : '2',
       // });
 
-      // $(document).ready(function(){
-
-      //   $("#no_rcv").keyup(function(){
-      //     $("#no_rcv-availability-status").html('');
-      //   });
 
 
-      // });
-      
+
+
+
       function checkNoRcv(value) {
 
         $.ajax({
@@ -277,20 +402,73 @@
           success: function(response) {
             console.log(response);
             if (response.status == 200 && response.message == 'success get data receiving') {
-                var number_string = response.results[0].totalrcv.toString(),
-                    sisa = number_string.length % 3,
-                    rupiah = number_string.substr(0, sisa),
-                    ribuan = number_string.substr(sisa).match(/\d{3}/g);
+              var number_string = response.results[0].totalrcv.toString(),
+                sisa = number_string.length % 3,
+                rupiah = number_string.substr(0, sisa),
+                ribuan = number_string.substr(sisa).match(/\d{3}/g);
 
-                var rcv_date = response.results[0].rcvdate.toString();     
+              var rcv_date = response.results[0].rcvdate.toString();
 
-                if (ribuan){
-                  separator = sisa ? '.' : '';
-                  rupiah += separator + ribuan.join('.');
-                }
+              if (ribuan) {
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+              }
 
               $('#jml_tgh').val(`Rp. ` + rupiah);
               $('#tgl_rcv').val(rcv_date);
+
+            } else if (response.status == 200 && response.message == 'data not found') {
+              $("#no_rcv-availability-status").html(response.results);
+              $("#check_no_rcv").hide();
+            }
+
+          }
+        })
+      }
+
+      function checkNoRcvUpdate(value) {
+
+        $.ajax({
+          type: "POST",
+          url: "<?php echo base_url('admin/receiving/validateRCV'); ?>",
+          data: {
+            norcv: value
+          },
+          success: function(res) {
+            // console.log(res);
+            const obj = JSON.parse(res);
+            if (obj.status == 200 && obj.message == 'success get data') {
+              $(".no_rcv-availability-status").html(obj.results);
+              $(".check_no_rcv").hide();
+            } else {
+              chekcToIdemUpdate(value);
+            }
+
+          }
+        });
+      }
+
+      function chekcToIdemUpdate(value) {
+        $.ajax({
+          type: "GET",
+          url: `http://szytoolsapi.suzuyagroup.com:8181/rcvheader/${value}/<?= $this->session->userdata('username'); ?>`,
+          success: function(response) {
+            console.log(response);
+            if (response.status == 200 && response.message == 'success get data receiving') {
+              var number_string = response.results[0].totalrcv.toString(),
+                sisa = number_string.length % 3,
+                rupiah = number_string.substr(0, sisa),
+                ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+              var rcv_date = response.results[0].rcvdate.toString();
+
+              if (ribuan) {
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+              }
+
+              $('.jml_tgh').val(`Rp. ` + rupiah);
+              $('.tgl_rcv').val(rcv_date);
 
             } else if (response.status == 200 && response.message == 'data not found') {
               $("#no_rcv-availability-status").html(response.results);
@@ -309,7 +487,8 @@
 
       $(document).ready(function() {
         addRow();
-        
+
+
       });
 
 

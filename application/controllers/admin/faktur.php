@@ -138,16 +138,22 @@ class faktur extends CI_Controller
 
 		$csv = $_FILES['csv']['name'];
 
+		// var_dump($no_faktur); die;
+
 
 		// cek validasi data duplikat pada nomor faktur supplier
 		// $sql = "";
-		$sqlCekFaktur  = $this->db2->query("SELECT * FROM tb_faktur WHERE no_faktur = '$no_faktur'");
+		$sqlCekFaktur  = $this->db2->query("SELECT fak_pjk FROM tb_faktur WHERE fak_pjk = '$faktur_pajak'");
+
+		// var_dump($sqlCekFaktur); die;
 		// $sqlCekBarcode = $this->db2->query("SELECT fak_pjk FROM tb_faktur WHERE fak_pjk = '$faktur_pajak'");
 		$cek = $sqlCekFaktur->num_rows();
+
+		// var_dump($cek); die;
 		// $cek2 = $sqlCekBarcode->num_rows();
-		if ($cek > 0){
+		if ($cek > 0) {
 			$this->session->set_flashdata('message', '<div class="alert alert-warning alert-dismissible  fade show" role="alert">
-			<strong>nomor faktur supplier atau url barcode faktur pajak sudah pernah digunakan</strong>
+			<strong>url barcode faktur pajak sudah pernah digunakan</strong>
 			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 			  <span aria-hidden="true">&times;</span>
 			</button>
@@ -160,13 +166,14 @@ class faktur extends CI_Controller
 			// 	'results' => "<p class='text-danger'>no receiving sudah ada, silahkan ganti dengan yang lain</p>"
 			// ];
 			// echo json_encode($data);
-            
+
 		} else {
 			if ($csv = '') {
 			} else {
 				$config['upload_path'] = './assets/csv';
 				$config['allowed_types'] = 'csv';
 				$this->load->library('upload', $config);
+
 				if (!$this->upload->do_upload('csv')) {
 					echo "File gagal di upload";
 				} else {
@@ -189,25 +196,27 @@ class faktur extends CI_Controller
 
 					foreach ($pecahCsv as $key => $values) {
 						// echo print_r(array_sum($values[11])); die;
-
+						// var_dump($values[11]);
 						$total += (int) $values[11];
 
-						
+
 						$cekCount = count($values);
 						// var_dump($cekCount);die;
 
 
 						if ($key > 0) {
 							if ($cekCount == 12) {
-								$data[]=[
-									'fak_supp'=> $no_faktur,
-									'kode_supp'=> $kode_supplier,
-									'nama_brg'=> $values[6],
-									'qty'=> $values[7],
-									'harga'=> $values[8],
-									'disc'=> $values[9],
-									'ppn'=> $values[10],
-									'total'=> $values[11]
+								$data[] = [
+							        'no_rcv' => $no_rcv,
+									'fak_supp' => $no_faktur,
+									'kode_supp' => $kode_supplier,
+									'barcode' => $values[5],
+									'nama_brg' => $values[6],
+									'qty' => $values[7],
+									'harga' => $values[8],
+									'disc' => $values[9],
+									'ppn' => $values[10],
+									'total' => $values[11]
 								];
 
 
@@ -228,14 +237,18 @@ class faktur extends CI_Controller
 						}
 					}
 
+					// var_dump($total,$tagihan); die;
 
-					if($total == $tagihan ){
-						foreach($data as $dt){
+					$selisih = $tagihan - $total;
+
+					// var_dump(abs($selisih)); die;
+
+					if (abs($selisih) <= 300) {
+						foreach ($data as $dt) {
 							// print_r($dt); die;
 							$this->db2->insert('csv_detail', $dt);
 						}
-
-					}else{
+					} else {
 						// print_r('selisih');
 						$this->session->set_flashdata('message', '<div class="alert alert-warning alert-dismissible  fade show" role="alert">
 						<strong>file csv anda tidak sesuai dengan total tagihan faktur pajak</strong>
@@ -286,9 +299,6 @@ class faktur extends CI_Controller
 
 			redirect('admin/faktur/index/' . $no_rcv);
 		}
-
-
-
 	}
 
 
@@ -315,36 +325,36 @@ class faktur extends CI_Controller
 
 	public function validateFakturSupplier()
 	{
-		
-			$no_faktur    = $this->input->post('no_faktur');
-			
 
-			$cekFakturSupplier = $this->bttModel->cekFakturSupplier($no_faktur);
-			
+		$no_faktur    = $this->input->post('no_faktur');
 
-			if ($cekFakturSupplier > 0) {
-				$data = [
-					'status'  => 200,
-					'error'   => false,
-					'message' => "success get data",
-					'results' => "<p class='text-danger'>no. faktur supplier sudah ada, silahkan ganti dengan yang lain</p>"
-				];
-				echo json_encode($data);
-			} 
-	}
 
-	public function validateScanQrcode()
-	{
-		$faktur_pajak = $this->input->post('fak_pjk');
-		
-		$cekScanQrcode = $this->bttModel->cekScanQrcode($faktur_pajak);
+		$cekFakturSupplier = $this->bttModel->cekFakturSupplier($no_faktur);
 
-		if($cekScanQrcode > 0){
+
+		if ($cekFakturSupplier > 0) {
 			$data = [
 				'status'  => 200,
 				'error'   => false,
 				'message' => "success get data",
-				'results' => "<p class='text-danger'>Qrcode sudah digunakan, silahkan scan kembali</p>"
+				'results' => "<p class='text-danger'>no. faktur supplier sudah ada, silahkan ganti dengan yang lain</p>"
+			];
+			echo json_encode($data);
+		}
+	}
+
+	public function validateNofakturPajak()
+	{
+		$no_faktur_pajak = $this->input->post('no_fak_pjk');
+
+		$cekScanQrcode = $this->bttModel->cekScanQrcode($no_faktur_pajak);
+
+		if ($cekScanQrcode > 0) {
+			$data = [
+				'status'  => 200,
+				'error'   => false,
+				'message' => "success get data",
+				'results' => "<p class='text-danger'>nomor faktur pajak sudah digunakan</p>"
 			];
 			echo json_encode($data);
 		}
@@ -366,30 +376,38 @@ class faktur extends CI_Controller
 	public function checkqrcode()
 	{
 		$url = $this->input->post('link');
+		$cek = $this->db2->query("SELECT fak_pjk FROM tb_faktur WHERE fak_pjk = '$url'")->result_array();
+		$hitung = count($cek);
 
-		$curl = curl_init();
-		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-		// curl_setopt($curl, CURLOPT_HTTPHEADER, $key_load);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		// EXECUTE:
-		$result = curl_exec($curl);
-		curl_close($curl);
-		$data = simplexml_load_string($result);
+		if ($hitung == 0) {
+			$curl = curl_init();
+			curl_setopt($curl, CURLOPT_URL, $url);
+			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+			// curl_setopt($curl, CURLOPT_HTTPHEADER, $key_load);
+			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+			// EXECUTE:
+			$result = curl_exec($curl);
+			curl_close($curl);
+			$data = simplexml_load_string($result);
 
 
-		if ($data->body . '0' == "No service was found.0") {
-			echo json_encode($data->body . '0' == "No service was found.0");
+			if ($data->body . '0' == "No service was found.0") {
+				echo json_encode($data->body . '0' == "No service was found.0");
+			} else {
+				$faktur = $data->nomorFaktur;
+				$total = $data->jumlahDpp + $data->jumlahPpn;
+
+				$data = [
+					'no_faktur' => $faktur . "0",
+					'total' => $total
+				];
+				echo json_encode($data);
+			}
 		} else {
-			$faktur = $data->nomorFaktur;
-			$total = $data->jumlahDpp + $data->jumlahPpn;
-
-			$data = [
-				'no_faktur' => $faktur . "0",
-				'total' => $total
-			];
-			echo json_encode($data);
+			echo json_encode(array("ada"));
 		}
+
+
 
 		// die;
 
@@ -436,6 +454,59 @@ class faktur extends CI_Controller
 		} else {
 			redirect('admin/faktur/index/' . $no_rcv);
 		}
+	}
+
+	public function edit_Faktur()
+	{
+		$kode_supplier = $this->session->userdata('username');
+		$id_faktur = $this->input->post('id_faktur');
+		$no_rcv = $this->input->post('no_rcv');
+		$no_faktur = $this->input->post('no_faktur');
+		$faktur_pajak = $this->input->post('fak_pjk');
+		$no_faktur_pajak = $this->input->post('no_fak_pjk');
+		$tagihan = $this->input->post('tagihan');
+
+		$tagihan = str_replace(['Rp', '.', ' '], '', $tagihan);
+		$tagihan = str_replace(',', '.', $tagihan);
+
+		$csv = $_FILES['csv']['name'];
+
+		if ($csv) {
+			$config['upload_path'] = './assets/csv';
+			$config['allowed_types'] = 'csv';
+			$this->load->library('upload', $config);
+
+			if ($this->upload->do_upload('csv')) {
+				$csv = $this->upload->data('file_name');
+				$this->db2->set('csv', $csv);
+				echo "File gagal di upload";
+			} else {
+				echo $this->upload->display_errors();
+			}
+		}
+
+
+		$data = array(
+			'no_rcv' => $no_rcv,
+			'no_faktur' => $no_faktur,
+			'faktur_pajak' => $faktur_pajak,
+			'no_fak_pjk' => $no_faktur_pajak,
+			'jml_tgh' => (float)$tagihan,
+		);
+
+		$where = array(
+			'id_faktur' => $id_faktur
+		);
+
+		$this->bttModel->update_rcv('tb_faktur', $data, $where);
+		$this->session->set_flashdata('message', '<div class="alert alert-success alert-dismissible  fade show" role="alert">
+		<strong>Data Berhasil diubah!</strong>
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+		</div>');
+
+		redirect('admin/receiving/index/' . $no_rcv);
 	}
 
 	public function _rules()
