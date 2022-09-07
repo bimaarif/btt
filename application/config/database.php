@@ -122,7 +122,7 @@ $db['database3'] = array(
 	'hostname' => '172.27.1.9',
 	'username' => 'suz',
 	'password' => 'suz45',
-	'database' => '',
+	'database' => 'suz',
 	'dbdriver' => 'pdo',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
@@ -136,5 +136,6 @@ $db['database3'] = array(
 	'compress' => FALSE,
 	'stricton' => FALSE,
 	'failover' => array(),
-	'save_queries' => TRUE
+	'save_queries' => TRUE,
+	'schema'   => 'adempiere'
 );
