@@ -134,6 +134,13 @@ class bttModel extends CI_model
         return $delete;
     }
 
+    public function hapusDataFaktur1($no_rcv)
+    {
+        $delete = $this->db2->delete('tb_faktur', ['no_rcv' => $no_rcv]);
+        return $delete;
+    }
+
+
 
     public function insert_receiving($data)
     {

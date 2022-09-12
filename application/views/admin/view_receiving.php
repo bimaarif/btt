@@ -118,7 +118,7 @@
                         <a href="<?php echo base_url() . 'admin/faktur/index/' . $rcv->no_rcv; ?>" type="button" class="btn btn-primary">input faktur</a>
                         <a href="" data-id_rcv="<?php echo $rcv->id_rcv ?>" data-no_rcv="<?php echo $rcv->no_rcv ?>" data-jml_tgh="<?php echo $rcv->jml_tgh ?>" data-tgl_rcv="<?php echo $rcv->tgl_rcv ?>" class="btn btn-success ubah" data-toggle="modal">Ubah</a>
 
-                        <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/receiving/hapus_rcv/<?= $rcv->id_rcv . '/' . $no_btt ?>" class="btn btn-danger">hapus</a>
+                        <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/receiving/hapus_rcv/<?= $rcv->id_rcv . '/' . $no_btt.'/'.$rcv->no_rcv ?>" class="btn btn-danger">hapus</a>
                       </td>
                     </tr>
                   <?php endforeach; ?>

@@ -478,7 +478,7 @@ class faktur extends CI_Controller
 
 			if ($this->upload->do_upload('csv')) {
 				$csv = $this->upload->data('file_name');
-				$this->db2->set('csv', $csv);
+				// $this->db2->set('csv', $csv);
 				echo "File gagal di upload";
 			} else {
 				echo $this->upload->display_errors();
@@ -492,7 +492,10 @@ class faktur extends CI_Controller
 			'faktur_pajak' => $faktur_pajak,
 			'no_fak_pjk' => $no_faktur_pajak,
 			'jml_tgh' => (float)$tagihan,
+			'csv' => $csv
 		);
+
+		// var_dump($data); die;
 
 		$where = array(
 			'id_faktur' => $id_faktur

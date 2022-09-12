@@ -204,13 +204,18 @@ class receiving extends CI_Controller
 		redirect('admin/receiving/index/' . $no_btt);
 	}
 
-	public function hapus_rcv($id_rcv, $no_btt)
+	public function hapus_rcv($id_rcv, $no_btt, $no_rcv)
 	{
+		// var_dump($no_rcv);
+		// var_dump($no_btt);die;
         $hapus = $this->bttModel->hapus_rcv($id_rcv, $no_btt);
 
-        // if($hapus){
-        //     $this->bttModel->hapusDataFaktur($no_rcv);
-		// } 
+		// $selectfaktur = "";
+
+        if($hapus){
+            $this->bttModel->hapusDataFaktur1($no_rcv);
+		} 
+
 		// $data['no_rcv'] = $no_receiving;
 		$this->session->set_flashdata('message', '<div class="alert alert-danger alert-dismissible  fade show" role="alert">
 		<strong>Data Berhasil di hapus!</strong>

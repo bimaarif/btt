@@ -232,7 +232,19 @@
 
               <div class="form-group">
                 <label>Upload CSV</label>
-                <input type="file" id="csv" onchange="checkfile(this);" class="form-control" placeholder="csv" name="csv" accept=".csv" required>
+
+
+                  <label class="sr-only" for="inlineFormInputGroup">Input file</label>
+                  <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">Chose file</div>
+                    </div>
+                    <input onclick="document.getElementById('fUpload').click()" type="text" class="form-control" id="vUpload" readonly>
+                  </div>
+                
+
+
+                <input hidden id="fUpload" type="file" onchange="checkfile(this);" class="form-control csv" placeholder="csv" name="csv" id="csv" accept=".csv" required>
                 <span class="text-danger">(hanya bisa upload file csv)</span>
               </div>
 
@@ -262,6 +274,10 @@
 
 
   <script>
+    $('#fUpload').change(function() {
+      $('#vUpload').val($('#fUpload')[0].files[0].name);
+    })
+
     function handleUpdateOrAddFaktur(me, action) {
       if (action == 'add') {
         $('#id_faktur').val('');
@@ -269,6 +285,8 @@
         $('#fak_pjk').val('');
         $('#no_fak_pjk').val('');
         $('#tagihan').val('');
+        $('#csv').val('');
+
         $('#tambahFaktur .modal-title').text('Tambah Faktur')
         $('#tambahFaktur form').attr('action', "<?php echo base_url('admin/faktur/simpan_faktur'); ?>")
         $('#tambahFaktur').modal('show');
@@ -282,7 +300,9 @@
         const fak_pjk = $(me).data('fak_pjk');
         const no_fak_pjk = $(me).data('no_fak_pjk');
         const tagihan = $(me).data('tagihan');
-        // const csv = $(me).data('csv');
+        const csv = $(me).data('csv');
+
+        console.log(csv);
 
         var number_string = tagihan.toString(),
           sisa = number_string.length % 3,
@@ -299,10 +319,13 @@
         $('#qrcode1').val(fak_pjk);
         $('#no_fak_pjk').val(no_fak_pjk);
         $('#tagihan').val('Rp. ' + rupiah);
-        // $('#file').val(csv);
+        $('#vUpload').val(csv);
+
+        // console.log(data);
 
         $('#tambahFaktur .modal-title').text('Ubah Faktur')
         $('#tambahFaktur form').attr('action', "<?php echo base_url('admin/faktur/edit_Faktur'); ?>")
+        // $('#tambahfaktur .csv').attr('required','FALSE');
         $('#tambahFaktur').modal('show');
         return
       }
