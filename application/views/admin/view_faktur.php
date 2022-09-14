@@ -198,6 +198,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <form action="<?php echo base_url('admin/faktur/simpan_faktur'); ?>" method="POST" enctype="multipart/form-data">
+          <input type="text" name="id_faktur" id="id_faktur" hidden>
           <div class="modal-header">
             <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -239,7 +240,7 @@
                     <div class="input-group-prepend">
                       <div class="input-group-text">Chose file</div>
                     </div>
-                    <input onclick="document.getElementById('fUpload').click()" type="text" class="form-control" id="vUpload" readonly>
+                    <input onclick="document.getElementById('fUpload').click()" type="text" class="form-control" id="vUpload" name="csv" readonly>
                   </div>
                 
 

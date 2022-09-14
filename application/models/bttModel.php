@@ -223,8 +223,10 @@ class bttModel extends CI_model
     }
 
     public function edit_faktur($table,$data,$where){
+        // var_dump($where);
+        // var_dump($data);die;
         $result = $this->db2->update($table,$data,$where);
-
+        var_dump($result); die;
         return $result;
     }
 
@@ -288,4 +290,5 @@ class bttModel extends CI_model
         $result = $this->db2->query($query)->result_array();                                                                                                                                                                                                                                                   
         return $result[0];
     }
+
 }

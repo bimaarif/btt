@@ -23,4 +23,10 @@ class FakturModel extends CI_model
         $result = $this->db2->query($sql);
         return $result;
     }
+
+    public function total_jml_fak($no_rcv){
+        $sql = "SELECT SUM(tagihan) as total_fak FROM tb_faktur WHERE no_rcv = '$no_rcv'";
+        $result = $this->db2->query($sql);
+        return $result;
+    } 
 }
