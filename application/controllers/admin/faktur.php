@@ -18,8 +18,10 @@ class faktur extends CI_Controller
 	{
 		// var_dump($no_rcv);
 		// die;
-		$checkReceiving = $this->bttModel->noFaktur($no_rcv)->result();
+		$this->load->model('FakturModel');
 
+		$checkReceiving = $this->bttModel->noFaktur($no_rcv)->result();
+		// $this->FakturModel->total_jml_fak($no_rcv)->num_rows();
 		if (count($checkReceiving) > 0) {
 			$data['faktur'] = $this->bttModel->cekFaktur($checkReceiving[0]->no_rcv)->result();
 			$noBtt = $data['faktur'][0]->no_btt;
@@ -29,6 +31,7 @@ class faktur extends CI_Controller
 				$data['faktur'] = $this->bttModel->noFaktur($no_rcv)->result();
 				$data['no_rcv'] = $no_rcv;
 				$data['no_bttt'] = $noBtt;
+				$data['total_faktur'] = $this->FakturModel->total_jml_fak($no_rcv)->row();
 				$this->load->view('templates_admin/header');
 				$this->load->view('templates_admin/sidebar');
 				$this->load->view('admin/view_faktur', $data);
@@ -39,6 +42,7 @@ class faktur extends CI_Controller
 			$data['faktur'] = $this->bttModel->noFaktur($no_rcv)->result();
 			$data['no_rcv'] = $no_rcv;
 			$data['no_bttt'] = $no_rcv;
+			$data['total_faktur'] = $this->FakturModel->total_jml_fak($no_rcv)->row();
 			// var_dump($no_rcv);
 
 			$this->load->view('templates_admin/header');
@@ -145,13 +149,28 @@ class faktur extends CI_Controller
 		$totalHargaFaktur = $this->FakturModel->total_jml_fak($no_rcv)->row();
 
 		$totalRcv = $totalHargaRcv->jml_tgh;
-		$totalFaktur = $totalHargaFaktur->total_fak;
+		$totalFaktur = $totalHargaFaktur->total_fak + $tagihan;
 
-		$selisihFakRcv = $totalRcv - $totalFaktur;
+		// $selisihFakRcv = $totalRcv - $totalFaktur;
+		// if($totalFaktur > $totalRcv){
+		// 	echo "total rcv : ".$totalRcv;
+		// 	echo "<br>";
+		// 	echo "total faktur : ".$totalFaktur;
+		// 	echo "<br>";
+		// 	echo "Total harga faktur yang anda masukkan sudah melebihi total harga di reiceiving";
+		// }else{
+		// 	echo "total rcv : ".$totalRcv;
+		// 	echo "<br>";
+		// 	echo "total faktur : ".$totalFaktur;
+		// 	echo "<br>";
+		// 	echo "Total faktur yang anda masukkan sesuai rcv";
+		// }
+
+		// die;
 
 		// var_dump($selisihFakRcv);
 		// var_dump($totalRcv); die;
-
+		// var_dump($totalFaktur); die;
 		// var_dump($no_faktur); die;
 
 
@@ -168,12 +187,12 @@ class faktur extends CI_Controller
 		// var_dump($totalHargaFaktur->total_fak);
 		// var_dump($totalHargaRcv->jml_tgh);
 		// die;
-       
-        
+
+
 		// var_dump($totalFaktur);
 		// var_dump($totalRcv);
 		//  die;
-	
+
 
 		if ($cek > 0) {
 			$this->session->set_flashdata('message', '<div class="alert alert-warning alert-dismissible  fade show" role="alert">
@@ -221,6 +240,7 @@ class faktur extends CI_Controller
 					foreach ($pecahCsv as $key => $values) {
 						// echo print_r(array_sum($values[11])); die;
 						// var_dump($values[11]);
+						// total di csv
 						$total += (int) $values[11];
 
 
@@ -262,19 +282,20 @@ class faktur extends CI_Controller
 					}
 
 
+					// selisih tagihan di faktur pajak di kurang dengan total di csv
 
 					$selisih = $tagihan - $total;
+
 
 					// var_dump(abs($selisih)); die;
 					if (abs($selisih) <= 300) {
 						// var_dump($totalHargaRcv); 
-						// var_dump($totalHargaFaktur); die;   
-
-
-						foreach ($data as $dt) {
-							// print_r($dt); die; 
-							$this->db2->insert('csv_detail', $dt);
-						}
+						// var_dump($totalHargaFaktur); die;   						
+							foreach ($data as $dt) {
+								// print_r($dt); die; 
+								$this->db2->insert('csv_detail', $dt);
+							}
+						
 					} else {
 						// print_r('selisih');
 						$this->session->set_flashdata('message', '<div class="alert alert-warning alert-dismissible  fade show" role="alert">
@@ -317,23 +338,23 @@ class faktur extends CI_Controller
 			);
 
 			// $selisihRcvFak = $totalFaktur - $totalRcv;
-            
+
 			// var_dump($selisihRcvFak);
 			// var_dump($totalFaktur);
-		    // var_dump($totalRcv);
-		    // die;
+			// var_dump($totalRcv);
+			// die;
 
-			if ($selisihFakRcv <= $totalFaktur) {
-			// var_dump($totalFaktur);
-			// var_dump($totalRcv); die;
-			  $this->session->set_flashdata('message', '<div class="alert alert-warning alert-dismissible  fade show" role="alert">
+			if ($totalFaktur > $totalRcv) {
+				// var_dump($totalFaktur);
+				// var_dump($totalRcv); die;
+				$this->session->set_flashdata('message', '<div class="alert alert-warning alert-dismissible  fade show" role="alert">
 								<strong>Total harga faktur yang anda masukkan sudah melebihi total harga di reiceiving</strong>
 								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 								   <span aria-hidden="true">&times;</span>
 								</button>
 							  </div>');
-			  redirect('admin/faktur/index/' . $no_rcv);
-		    }else{
+				redirect('admin/faktur/index/' . $no_rcv);
+			} else {
 				$this->bttModel->insert_faktur($data, 'tb_faktur');
 				$this->session->set_flashdata('message', '<div class="alert alert-success alert-dismissible  fade show" role="alert">
 								<strong>Data Berhasil ditambahkan !</strong>
@@ -341,13 +362,13 @@ class faktur extends CI_Controller
 								  <span aria-hidden="true">&times;</span>
 								</button>
 								</div>');
-	
-				redirect('admin/faktur/index/' . $no_rcv);	
+
+				redirect('admin/faktur/index/' . $no_rcv);
 			}
-            
+
 			// var_dump($totalFaktur);
 			// var_dump($totalRcv); die;
-		
+
 			// $this->bttModel->insert_faktur($data, 'tb_faktur');
 			// $this->session->set_flashdata('message', '<div class="alert alert-success alert-dismissible  fade show" role="alert">
 			// 				<strong>Data Berhasil ditambahkan !</strong>
@@ -517,7 +538,7 @@ class faktur extends CI_Controller
 
 	public function edit_Faktur()
 	{
-		// $kode_supplier = $this->session->userdata('username');
+		$kode_supplier = $this->session->userdata('username');
 		$id_faktur = $this->input->post('id_faktur');
 		$no_rcv = $this->input->post('no_rcv');
 		$no_faktur = $this->input->post('no_faktur');
@@ -530,7 +551,16 @@ class faktur extends CI_Controller
 
 		$csv = $_FILES['csv']['name'];
 
-		if ($csv) {
+		$this->load->model('RcvModel');
+		$this->load->model('FakturModel');
+
+		$totalHargaRcv    = $this->RcvModel->total_tgh_rcv($no_rcv)->row();
+		$totalHargaFaktur = $this->FakturModel->total_jml_fak($no_rcv)->row();
+
+		$totalRcv = $totalHargaRcv->jml_tgh;
+		$totalFaktur = $totalHargaFaktur->total_fak + $tagihan;
+
+		if ($csv){
 			$config['upload_path'] = './assets/csv';
 			$config['allowed_types'] = 'csv';
 			$this->load->library('upload', $config);
@@ -540,7 +570,82 @@ class faktur extends CI_Controller
 				$this->db2->set('csv', $csv);
 				// echo "File gagal di upload";
 			} else {
+
 				echo $this->upload->display_errors();
+
+				$csv = $this->upload->data('file_name');
+				$pecahCsv = array_map('str_getcsv', file(base_url() . '/assets/csv/' . $csv));
+
+				$cek = '';
+				$no = 1;
+				$total = 0;
+				$sum = 0;
+				$data = [];
+                
+				foreach ($pecahCsv as $key => $values) {
+					
+					$total += (int) $values[11];
+
+
+					$cekCount = count($values);
+
+
+					if ($key > 0) {
+						if ($cekCount == 12) {
+							$data[] = [
+								'no_rcv' => $no_rcv,
+								'fak_supp' => $no_faktur,
+								'kode_supp' => $kode_supplier,
+								'barcode' => $values[5],
+								'nama_brg' => $values[6],
+								'qty' => $values[7],
+								'harga' => $values[8],
+								'disc' => $values[9],
+								'ppn' => $values[10],
+								'total' => $values[11]
+							];
+
+
+							// $detailCsv = "REPLACE INTO csv_detail (fak_supp, kode_supp, nama_brg, qty, harga, disc, ppn) values('$no_faktur','$kode_supplier','$values[6]','$values[7]','$values[8]','$values[9]','$values[10]')";
+
+							// $result = $this->db2->query($detailCsv);
+
+							// var_dump($result);
+
+							// echo "<pre>";
+							// echo print_r($result);
+							// echo "</pre>";
+							// die;
+							// $cek = $no++;
+
+							// die
+						}
+					}
+				}
+
+				// selisih tagihan di faktur pajak di kurang dengan total di csv
+
+				$selisih = $tagihan - $total;
+
+				// var_dump(abs($selisih)); die;
+				if (abs($selisih) <= 300) {
+					// var_dump($totalHargaRcv); 
+					// var_dump($totalHargaFaktur); die;   
+					foreach ($data as $dt) {
+						// print_r($dt); die; 
+						$this->db2->insert('csv_detail', $dt);
+					}
+				} else {
+					// print_r('selisih');
+					$this->session->set_flashdata('message', '<div class="alert alert-warning alert-dismissible  fade show" role="alert">
+					<strong>file csv anda tidak sesuai dengan total tagihan faktur pajak</strong>
+					<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					  <span aria-hidden="true">&times;</span>
+					</button>
+					</div>');
+					redirect('admin/faktur/index/' . $no_rcv);
+				}
+
 			}
 		}
 
@@ -561,6 +666,10 @@ class faktur extends CI_Controller
 		);
 
 		// var_dump($where); die;
+
+		if ($totalFaktur > $totalRcv) {
+
+		}
 
 		$this->bttModel->edit_faktur('tb_faktur', $data, $where);
 		$this->session->set_flashdata('message', '<div class="alert alert-success alert-dismissible  fade show" role="alert">

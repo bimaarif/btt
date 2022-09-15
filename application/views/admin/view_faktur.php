@@ -110,6 +110,11 @@
               </div>
             </div>
             <br>
+            <div class="row">
+              <div class="col">
+                <h5>Total Harga Faktur : Rp.<?php echo number_format($total_faktur->total_fak) ?></h5>
+              </div>
+            </div>
             <?php echo $this->session->flashdata('message') ?>
           </div>
           <div class="card-body">
@@ -235,14 +240,14 @@
                 <label>Upload CSV</label>
 
 
-                  <label class="sr-only" for="inlineFormInputGroup">Input file</label>
-                  <div class="input-group mb-2">
-                    <div class="input-group-prepend">
-                      <div class="input-group-text">Chose file</div>
-                    </div>
-                    <input onclick="document.getElementById('fUpload').click()" type="text" class="form-control" id="vUpload" name="csv" readonly>
+                <label class="sr-only" for="inlineFormInputGroup">Input file</label>
+                <div class="input-group mb-2">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">Chose file</div>
                   </div>
-                
+                  <input onclick="document.getElementById('fUpload').click()" type="text" class="form-control" id="vUpload" name="csv" readonly>
+                </div>
+
 
 
                 <input hidden id="fUpload" type="file" onchange="checkfile(this);" class="form-control csv" placeholder="csv" name="csv" id="csv" accept=".csv" required>
