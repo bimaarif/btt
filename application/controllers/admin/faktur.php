@@ -223,7 +223,6 @@ class faktur extends CI_Controller
 					$csv = $this->upload->data('file_name');
 
 
-
 					$pecahCsv = array_map('str_getcsv', file(base_url() . '/assets/csv/' . $csv));
 
 					// echo "<pre>";
@@ -286,16 +285,14 @@ class faktur extends CI_Controller
 
 					$selisih = $tagihan - $total;
 
-
 					// var_dump(abs($selisih)); die;
 					if (abs($selisih) <= 300) {
 						// var_dump($totalHargaRcv); 
 						// var_dump($totalHargaFaktur); die;   						
-							foreach ($data as $dt) {
-								// print_r($dt); die; 
-								$this->db2->insert('csv_detail', $dt);
-							}
-						
+						foreach ($data as $dt) {
+							// print_r($dt); die; 
+							$this->db2->insert('csv_detail', $dt);
+						}
 					} else {
 						// print_r('selisih');
 						$this->session->set_flashdata('message', '<div class="alert alert-warning alert-dismissible  fade show" role="alert">
@@ -551,6 +548,7 @@ class faktur extends CI_Controller
 
 		$csv = $_FILES['csv']['name'];
 
+
 		$this->load->model('RcvModel');
 		$this->load->model('FakturModel');
 
@@ -558,32 +556,34 @@ class faktur extends CI_Controller
 		$totalHargaFaktur = $this->FakturModel->total_jml_fak($no_rcv)->row();
 
 		$totalRcv = $totalHargaRcv->jml_tgh;
-		$totalFaktur = $totalHargaFaktur->total_fak + $tagihan;
-
-		if ($csv){
-			$config['upload_path'] = './assets/csv';
+		$totalFaktur = $totalHargaFaktur->total_fak;
+        
+		if ($csv) {	
+			$config['upload_path']   = './assets/csv';
 			$config['allowed_types'] = 'csv';
 			$this->load->library('upload', $config);
-
+			
 			if ($this->upload->do_upload('csv')) {
 				$csv = $this->upload->data('file_name');
+							
 				$this->db2->set('csv', $csv);
-				// echo "File gagal di upload";
-			} else {
-
-				echo $this->upload->display_errors();
-
+				// echo $this->upload->display_errors();
+				
+				echo "File gagal di upload";
+			} else {                
 				$csv = $this->upload->data('file_name');
+				
 				$pecahCsv = array_map('str_getcsv', file(base_url() . '/assets/csv/' . $csv));
-
+                // var_dump($pecahCsv);
+				var_dump($csv); die;
 				$cek = '';
 				$no = 1;
 				$total = 0;
 				$sum = 0;
 				$data = [];
-                
+
 				foreach ($pecahCsv as $key => $values) {
-					
+
 					$total += (int) $values[11];
 
 
@@ -629,11 +629,10 @@ class faktur extends CI_Controller
 
 				// var_dump(abs($selisih)); die;
 				if (abs($selisih) <= 300) {
-					// var_dump($totalHargaRcv); 
 					// var_dump($totalHargaFaktur); die;   
 					foreach ($data as $dt) {
 						// print_r($dt); die; 
-						$this->db2->insert('csv_detail', $dt);
+						$this->db2->update('csv_detail', $dt, $id_faktur);
 					}
 				} else {
 					// print_r('selisih');
@@ -645,7 +644,6 @@ class faktur extends CI_Controller
 					</div>');
 					redirect('admin/faktur/index/' . $no_rcv);
 				}
-
 			}
 		}
 
@@ -668,18 +666,24 @@ class faktur extends CI_Controller
 		// var_dump($where); die;
 
 		if ($totalFaktur > $totalRcv) {
+			$this->session->set_flashdata('message', '<div class="alert alert-warning alert-dismissible  fade show" role="alert">
+								<strong>Total harga faktur yang anda masukkan sudah melebihi total harga di reiceiving</strong>
+								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+								   <span aria-hidden="true">&times;</span>
+								</button>
+							  </div>');
+			redirect('admin/faktur/index/' . $no_rcv);
+		} else {
+			$this->bttModel->edit_faktur($data, $where);
+			$this->session->set_flashdata('message', '<div class="alert alert-success alert-dismissible  fade show" role="alert">
+			<strong>Data Berhasil diubah!</strong>
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			</div>');
 
+			redirect('admin/faktur/index/' . $no_rcv);
 		}
-
-		$this->bttModel->edit_faktur('tb_faktur', $data, $where);
-		$this->session->set_flashdata('message', '<div class="alert alert-success alert-dismissible  fade show" role="alert">
-		<strong>Data Berhasil diubah!</strong>
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
-		</button>
-		</div>');
-
-		redirect('admin/faktur/index/' . $no_rcv);
 	}
 
 

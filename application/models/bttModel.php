@@ -222,11 +222,14 @@ class bttModel extends CI_model
         return $result;
     }
 
-    public function edit_faktur($table,$data,$where){
+    public function edit_faktur($data,$where){
         // var_dump($where);
-        // var_dump($data);die;
-        $result = $this->db2->update($table,$data,$where);
-        var_dump($result); die;
+        // var_dump($data);
+        // die;
+        // $this->db2->where('id_faktur', $where);
+        $result = $this->db2->update('tb_faktur',$data,$where);
+        // $sql = "UPDATE tb_faktur SET status = 'Unconfirm' WHERE id_faktur = '$where'";
+         var_dump($result); die;
         return $result;
     }
 
