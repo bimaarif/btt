@@ -238,7 +238,7 @@ class faktur extends CI_Controller
 
 					foreach ($pecahCsv as $key => $values) {
 						// echo print_r(array_sum($values[11])); die;
-						// var_dump($values[11]);
+						// var_dump($values[11]); die;
 						// total di csv
 						$total += (int) $values[11];
 
@@ -276,8 +276,14 @@ class faktur extends CI_Controller
 								// $cek = $no++;
 
 								// die
+
+								// var_dump($data); die;
 							}
 						}
+                        
+						// if(){
+
+						// }
 					}
 
 
@@ -563,10 +569,10 @@ class faktur extends CI_Controller
 			$config['allowed_types'] = 'csv';
 			$this->load->library('upload', $config);
 			
-			if ($this->upload->do_upload('csv')) {
-				$csv = $this->upload->data('file_name');
+			if (!$this->upload->do_upload('csv')) {
+				// $csv = $this->upload->data('file_name');
 							
-				$this->db2->set('csv', $csv);
+				// $this->db2->set('csv', $csv);
 				// echo $this->upload->display_errors();
 				
 				echo "File gagal di upload";
@@ -575,7 +581,8 @@ class faktur extends CI_Controller
 				
 				$pecahCsv = array_map('str_getcsv', file(base_url() . '/assets/csv/' . $csv));
                 // var_dump($pecahCsv);
-				var_dump($csv); die;
+                
+				// var_dump($pecahCsv); die;
 				$cek = '';
 				$no = 1;
 				$total = 0;
@@ -610,7 +617,7 @@ class faktur extends CI_Controller
 
 							// $result = $this->db2->query($detailCsv);
 
-							// var_dump($result);
+							// var_dump($data); die;
 
 							// echo "<pre>";
 							// echo print_r($result);
@@ -630,10 +637,16 @@ class faktur extends CI_Controller
 				// var_dump(abs($selisih)); die;
 				if (abs($selisih) <= 300) {
 					// var_dump($totalHargaFaktur); die;   
-					foreach ($data as $dt) {
+					// foreach ($data as $dt) {
 						// print_r($dt); die; 
-						$this->db2->update('csv_detail', $dt, $id_faktur);
-					}
+						$delete = $this->db2->delete('csv_detail', array('no_rcv' => $no_rcv));
+
+						if($delete){
+							foreach ($data as $dt){
+							  $this->db2->insert('csv_detail', $dt);
+							}
+						}
+					// }
 				} else {
 					// print_r('selisih');
 					$this->session->set_flashdata('message', '<div class="alert alert-warning alert-dismissible  fade show" role="alert">
@@ -651,9 +664,9 @@ class faktur extends CI_Controller
 		$data = array(
 			'no_rcv' => $no_rcv,
 			'no_faktur' => $no_faktur,
-			'faktur_pajak' => $faktur_pajak,
+			'fak_pjk' => $faktur_pajak,
 			'no_fak_pjk' => $no_faktur_pajak,
-			'jml_tgh' => (float)$tagihan,
+			'tagihan' => (float)$tagihan,
 			'csv' => $csv
 		);
 
@@ -674,6 +687,8 @@ class faktur extends CI_Controller
 							  </div>');
 			redirect('admin/faktur/index/' . $no_rcv);
 		} else {
+			// var_dump($data);
+			// var_dump($where); die;
 			$this->bttModel->edit_faktur($data, $where);
 			$this->session->set_flashdata('message', '<div class="alert alert-success alert-dismissible  fade show" role="alert">
 			<strong>Data Berhasil diubah!</strong>

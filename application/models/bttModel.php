@@ -11,17 +11,18 @@ class bttModel extends CI_model
         $this->db3 = $this->load->database('database3', true);
     }
 
-    public function getCounter($supplierKode){
+    public function getCounter($supplierKode)
+    {
         $sql = "SELECT counter FROM tb_counter WHERE supplier = '$supplierKode'";
 
         $tampil = $this->db2->query($sql)->result_array();
         // var_dump($tampil);die;
         $data = null;
         $hitung = count($tampil);
-        if($hitung > 0 ){
+        if ($hitung > 0) {
             $counter = $tampil[0]['counter'] + 1;
             $data = "UPDATE tb_counter SET counter = '$counter' WHERE supplier = '$supplierKode'";
-        }else{
+        } else {
             $counter = 1;
             $data = "INSERT INTO tb_counter (supplier, counter) VALUES('$supplierKode','1')";
         }
@@ -33,9 +34,9 @@ class bttModel extends CI_model
 
     // create kode
     public function createCode()
-    {   
+    {
         $kodeSuplier = $this->session->userdata('username');
-        
+
         $counter = $this->getCounter($kodeSuplier);
         // var_dump($kode_supplier); die;
 
@@ -44,13 +45,13 @@ class bttModel extends CI_model
         $c = $a - $b;
         $d = '';
 
-        for ($i=0; $i < $c; $i++) { 
-            $d .='0';
+        for ($i = 0; $i < $c; $i++) {
+            $d .= '0';
         }
 
-        $counter = $d.$counter;
+        $counter = $d . $counter;
         $batas = date('Ym');
-        $kodetampil = "BTTT" . '.' . $batas.'.'.$counter;
+        $kodetampil = "BTTT" . '.' . $batas . '.' . $counter;
         return $kodetampil;
     }
 
@@ -109,13 +110,15 @@ class bttModel extends CI_model
         return $tampil;
     }
 
-    public function cekFakturSupplier($no_faktur){
+    public function cekFakturSupplier($no_faktur)
+    {
         $sql = "SELECT no_faktur FROM tb_faktur WHERE no_faktur = '$no_faktur'";
         $result = $this->db2->query($sql);
         return $result->num_rows();
     }
 
-    public function cekScanQrcode($no_faktur_pajak){
+    public function cekScanQrcode($no_faktur_pajak)
+    {
         $sql = "SELECT no_fak_pjk FROM tb_faktur WHERE no_fak_pjk = '$no_faktur_pajak";
         $result = $this->db2->query($sql);
         return $result->num_rows();
@@ -222,15 +225,31 @@ class bttModel extends CI_model
         return $result;
     }
 
-    public function edit_faktur($data,$where){
+    public function edit_faktur($data, $where)
+    {
         // var_dump($where);
         // var_dump($data);
         // die;
+        $id_faktur = $where['id_faktur'];
+        $no_rcv = $data['no_rcv'];
+        $no_fak = $data['no_faktur'];
+        $fak_pjk = $data['fak_pjk'];
+        $no_fak_pjk = $data['no_fak_pjk'];
+        $jml_tgh = $data['tagihan'];
+        $csv = $data['csv'];
         // $this->db2->where('id_faktur', $where);
-        $result = $this->db2->update('tb_faktur',$data,$where);
-        // $sql = "UPDATE tb_faktur SET status = 'Unconfirm' WHERE id_faktur = '$where'";
-         var_dump($result); die;
-        return $result;
+        // $this->db2->update('tb_faktur',$data,$where);
+        // var_dump($fak_pjk); 
+        // var_dump($jml_tgh);
+        //  die;
+
+        $sql = "UPDATE tb_faktur SET no_rcv = '$no_rcv', no_faktur = '$no_fak', fak_pjk = '$fak_pjk', 
+               no_fak_pjk = '$no_fak_pjk',tagihan = '$jml_tgh', csv = '$csv'
+               WHERE id_faktur = '$id_faktur'";
+        //  var_dump($sql); die;
+        $ubah = $this->db2->query($sql);
+        //  var_dump($ubah); die;
+        return $ubah;
     }
 
     public function cekFaktur($no_rcv)
@@ -256,13 +275,15 @@ class bttModel extends CI_model
         return $result;
     }
 
-    public function update_rcv($table,$data,$where){
-        $result = $this->db2->update($table,$data,$where);
+    public function update_rcv($table, $data, $where)
+    {
+        $result = $this->db2->update($table, $data, $where);
 
         return $result;
     }
 
-    public function hapus_rcv($id_rcv, $no_btt){
+    public function hapus_rcv($id_rcv, $no_btt)
+    {
         $delete = $this->db2->delete('tb_rcv', ['id_rcv' => $id_rcv, 'no_btt' => $no_btt]);
         return $delete;
     }
@@ -281,7 +302,7 @@ class bttModel extends CI_model
                   FROM tb_rcv LEFT JOIN tb_faktur ON tb_faktur.no_rcv = tb_rcv.no_rcv 
                   WHERE tb_rcv.no_btt = '$no_btt'";
         $result = $this->db2->query($query)->result_array();
-        
+
         return $result;
     }
 
@@ -290,8 +311,7 @@ class bttModel extends CI_model
         $query = "SELECT SUM(tb_faktur.tagihan) AS tot_tagihan
                   FROM tb_rcv LEFT JOIN tb_faktur ON tb_faktur.no_rcv = tb_rcv.no_rcv 
                   WHERE tb_rcv.no_btt = '$no_btt'";
-        $result = $this->db2->query($query)->result_array();                                                                                                                                                                                                                                                   
+        $result = $this->db2->query($query)->result_array();
         return $result[0];
     }
-
 }
