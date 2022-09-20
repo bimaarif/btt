@@ -216,13 +216,13 @@ class ProsesBanding extends CI_Controller
                     $sqlIdempLocal = $this->db2->query($sqlIdemp4)->result_array();
 
                     // $jumlah = count($sqlIdemp4);
-                   
+
                     foreach ($sqlIdempLocal as $val) {
                         // var_dump($val);
                         // die;
                         $sqlSuzzBttt2 = "INSERT INTO suz_bttt(bttt,bttt_date,document_mr,mr_line_id ,url_fp,adjustment) 
                         VALUES ('$val[no_bttt]','$val[date_create]','$val[document_mr]','$val[mr_line_id]','$val[url_fak_pjk]','$val[selisih_total_prc]')";
-                        
+
                         // var_dump($sqlSuzzBttt2); die;
                         $sqlSuzzBttt2 = $this->db2->query($sqlSuzzBttt2);
                         // var_dump($sqlSuzzBttt2); die;

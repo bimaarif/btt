@@ -141,7 +141,7 @@
                       <td>Rp. <?php echo number_format($f->tagihan); ?></td>
                       <td><?php echo $f->csv; ?></td>
                       <td>
-                        <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/faktur/hapus_faktur/<?= $f->id_faktur . '/' . $no_rcv ?>" class="btn btn-danger">hapus</a>
+                        <a onclick="return confirm('yakin mau dihapus')" href="<?= base_url(); ?>admin/faktur/hapus_faktur/<?= $f->id_faktur . '/' . $no_rcv. '/' . $f->no_faktur; ?>" class="btn btn-danger">hapus</a>
                         <a href="#" onclick="handleUpdateOrAddFaktur(this,'update')" data-id_faktur="<?php echo $f->id_faktur ?>" data-no_faktur="<?php echo $f->no_faktur ?>" data-fak_pjk="<?php echo $f->fak_pjk ?>" data-no_fak_pjk="<?php echo $f->no_fak_pjk ?>" data-tagihan="<?php echo $f->tagihan ?>" data-csv="<?php echo $f->csv ?>" class="btn btn-success ubahFak">Ubah</a>
                       </td>
                     </tr>
