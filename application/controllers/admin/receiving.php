@@ -71,6 +71,7 @@ class receiving extends CI_Controller
 		$receiving     = $this->input->post('no_rcv');
 		$total_tagihan = $this->input->post('jml_tgh');
 		$tgl_rcv       = $this->input->post('tgl_rcv');
+		$topInDays     = $this->input->post('topindays');
 
 
 
@@ -82,6 +83,7 @@ class receiving extends CI_Controller
 			'no_rcv' => $receiving,
 			'jml_tgh' => (float)$tagihan,
 			'tgl_rcv' => $tgl_rcv,
+			'topindays' => $topInDays 
 		);
 
 		$this->bttModel->insert_receiving($data, 'tb_rcv');

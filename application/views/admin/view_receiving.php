@@ -200,6 +200,9 @@
                 <label>Tanggal Receiving</label>
                 <input type="date" class="form-control" placeholder="masukkan tanggal receiving" name="tgl_rcv" id="tgl_rcv" readonly required>
               </div>
+              <div class="form-group">
+                <input type="text" class="form-control topindays" placeholder="topindays" name="topindays" id="topindays" readonly required hidden>
+              </div>
               <button type="submit" class="btn btn-primary">simpan</button>
             </form>
           </div>
@@ -238,7 +241,9 @@
                 <label>Tanggal Receiving</label>
                 <input type="date" class="form-control tgl_rcv" placeholder="masukkan tanggal receiving" name="tgl_rcv" id="tgl_rcv" readonly required>
               </div>
-
+              <div class="form-group">
+                <input type="text" class="form-control topindays" placeholder="topindays" name="topindays" id="topindays" readonly required>
+              </div>
               <button type="submit" class="btn btn-primary">Ubah</button>
             </form>
           </div>
@@ -408,6 +413,7 @@
                 ribuan = number_string.substr(sisa).match(/\d{3}/g);
 
               var rcv_date = response.results[0].rcvdate.toString();
+              var topindays = response.results[0].topindays.toString();
 
               if (ribuan) {
                 separator = sisa ? '.' : '';
@@ -416,6 +422,7 @@
 
               $('#jml_tgh').val(`Rp. ` + rupiah);
               $('#tgl_rcv').val(rcv_date);
+              $('#topindays').val(topindays);
 
             } else if (response.status == 200 && response.message == 'data not found') {
               $("#no_rcv-availability-status").html(response.results);

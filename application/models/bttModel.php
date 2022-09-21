@@ -150,6 +150,7 @@ class bttModel extends CI_model
         $no_fak = $data['no_rcv'];
         $jml_tagihan = $data['jml_tgh'];
         $tgl_rcv = $data['tgl_rcv'];
+        $topInDays = $data['topindays'];
         $no_btt = $data['no_btt'];
 
         // $data = array(
@@ -159,7 +160,7 @@ class bttModel extends CI_model
 
         // var_dump($data); die;
 
-        $sql = "INSERT INTO tb_rcv(no_btt,no_rcv,jml_tgh,tgl_rcv)values('$no_btt','$no_fak','$jml_tagihan',' $tgl_rcv')";
+        $sql = "INSERT INTO tb_rcv(no_btt,no_rcv,jml_tgh,tgl_rcv,topindays)values('$no_btt','$no_fak','$jml_tagihan',' $tgl_rcv','$topInDays')";
         $simpan = $this->db2->query($sql);
 
         return $simpan;

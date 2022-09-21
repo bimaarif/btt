@@ -125,6 +125,11 @@
   </div>
 
   <script>
+
+    $('#tambah_btt').on('click', function(){
+
+    })
+
     function getData(values) {
       $.ajax({
         type: "POST",
