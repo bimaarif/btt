@@ -46,9 +46,13 @@ class ProsesKlaim extends CI_Controller
                $temp = strtotime("+$indays day", $most);
                $temp = date('Y-m-d', $temp);
 
-               var_dump($temp); die;
+            //    var_dump($temp); die;
 
+               $insertKlaim = "INSERT INTO claim_date (no_btt, claim_date) VALUES('$no_btt','$temp')";
 
+               $result = $this->db2->query($insertKlaim);
+
+               var_dump($result); die; 
 
         } catch (\Throwable $th) {
             echo "Error: " . $th->getMessage();
